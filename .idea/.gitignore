@@ -1,0 +1,38 @@
+# ======================================
+# Java / Maven
+# ======================================
+target/
+*.class
+*.jar
+*.war
+*.ear
+out/
+
+# VS Code (if someone in team uses it)
+.vscode/
+
+# Logs
+*.log
+
+# OS files (Mac, Windows)
+.DS_Store
+Thumbs.db
+
+# HTTP client requests (IntelliJ)
+httpRequests/
+
+# IntelliJ Datasource files
+dataSources/
+dataSources.local.xml
+
+# IntelliJ IDEA
+# Ignore everything in .idea
+.idea/*
+# Except files we want to keep in repo
+!.idea/modules.xml
+!.idea/*.iml
+
+# Maven wrapper files (optional, keep if you use wrapper)
+mvnw
+mvnw.cmd
+.mvn/

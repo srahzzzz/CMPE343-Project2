@@ -2,6 +2,7 @@ package service;
 
 import dao.UserDAO;
 import model.User;
+import menu.*;
 import org.mindrot.jbcrypt.BCrypt;
 
 import java.util.Scanner;
@@ -20,36 +21,64 @@ public class AuthService {
     private final Scanner scanner = new Scanner(System.in);
 
     /**
-     * Starts the login loop. Returns after a single attempt for now.
+     * Starts the login loop and launches appropriate menu based on role.
      */
     public void startLogin() {
-        System.out.println("---------- LOGIN ----------");
+        while (true) {
+            System.out.println("---------- LOGIN ----------");
 
-        System.out.print("Username: ");
-        String username = scanner.nextLine().trim();
+            System.out.print("Username: ");
+            String username = scanner.nextLine().trim();
 
-        System.out.print("Password: ");
-        String password = scanner.nextLine().trim();
+            System.out.print("Password: ");
+            String password = scanner.nextLine().trim();
 
-        User user = userDAO.findByUsername(username);
+            User user = userDAO.findByUsername(username);
 
-        if (user == null) {
-            System.out.println("User not found.\n");
-            return;
+            if (user == null) {
+                System.out.println("User not found. Please try again.\n");
+                continue;
+            }
+
+            if (!verifyPassword(password, user)) {
+                System.out.println("Invalid password. Please try again.\n");
+                continue;
+            }
+
+            // Login successful - launch role-specific menu
+            launchMenu(user);
+            break;
+        }
+    }
+
+    /**
+     * Launches the appropriate menu based on user role.
+     *
+     * @param user the authenticated user
+     */
+    private void launchMenu(User user) {
+        BaseMenu menu;
+        String role = user.getRole();
+
+        switch (role) {
+            case "Tester":
+                menu = new TesterMenu(user);
+                break;
+            case "Junior":
+                menu = new JuniorMenu(user);
+                break;
+            case "Senior":
+                menu = new SeniorMenu(user);
+                break;
+            case "Manager":
+                menu = new ManagerMenu(user);
+                break;
+            default:
+                System.out.println("Unknown role: " + role);
+                return;
         }
 
-        if (!verifyPassword(password, user)) {
-            System.out.println("Invalid password.\n");
-            return;
-        }
-
-        System.out.printf("Welcome %s %s! Role: %s%n%n",
-                user.getName(),
-                user.getSurname(),
-                user.getRole());
-
-        // Placeholder for future role-specific menu launch.
-        System.out.println("Role-based menus coming soon...\n");
+        menu.run();
     }
 
     /**

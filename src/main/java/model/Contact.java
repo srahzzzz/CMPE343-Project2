@@ -12,8 +12,11 @@ public class Contact {
 
     private int contactId;
     private String firstName;
+    private String middleName; 
     private String lastName;
+    private String nickname;
     private String phonePrimary;
+    private String phoneSecondary;
     private String email;
     private String linkedinUrl;
     private LocalDate birthDate;
@@ -25,11 +28,20 @@ public class Contact {
     public String getFirstName() { return firstName; }
     public void setFirstName(String f) { this.firstName = f; }
 
+    public String getMiddleName() { return middleName; }
+    public void setMiddleName(String m) { this.middleName = m; }
+
     public String getLastName() { return lastName; }
     public void setLastName(String l) { this.lastName = l; }
 
+    public String getNickname() { return nickname; }
+    public void setNickname(String n) { this.nickname = n; }
+
     public String getPhonePrimary() { return phonePrimary; }
     public void setPhonePrimary(String p) { this.phonePrimary = p; }
+
+    public String getPhoneSecondary() { return phoneSecondary; }
+    public void setPhoneSecondary(String p) { this.phoneSecondary = p; }
 
     public String getEmail() { return email; }
     public void setEmail(String e) { this.email = e; }

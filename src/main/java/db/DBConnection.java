@@ -25,9 +25,12 @@ public class DBConnection {
         try {
             if (connection == null || connection.isClosed()) {
                 connection = DriverManager.getConnection(URL, USER, PASSWORD);
+                // Explicitly use the contactdb database
+                connection.setCatalog("contactdb");
             }
         } catch (Exception e) {
             System.out.println("DB Connection Error: " + e.getMessage());
+            e.printStackTrace();
         }
         return connection;
     }

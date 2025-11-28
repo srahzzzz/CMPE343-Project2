@@ -42,8 +42,14 @@ public class UserDAO {
                 return u;
             }
 
-        } catch (Exception e) {
+        } catch (SQLException e) {
             System.out.println("UserDAO Error: " + e.getMessage());
+            System.out.println("SQL State: " + e.getSQLState());
+            System.out.println("Error Code: " + e.getErrorCode());
+            e.printStackTrace();
+        } catch (Exception e) {
+            System.out.println("UserDAO Unexpected Error: " + e.getMessage());
+            e.printStackTrace();
         }
 
         return null;
@@ -63,8 +69,13 @@ public class UserDAO {
             ps.setString(1, passwordHash);
             ps.setInt(2, userId);
             ps.executeUpdate();
-        } catch (Exception e) {
+        } catch (SQLException e) {
             System.out.println("UserDAO Error (updatePasswordHash): " + e.getMessage());
+            System.out.println("SQL State: " + e.getSQLState());
+            e.printStackTrace();
+        } catch (Exception e) {
+            System.out.println("UserDAO Unexpected Error (updatePasswordHash): " + e.getMessage());
+            e.printStackTrace();
         }
     }
 }

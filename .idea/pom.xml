@@ -15,7 +15,7 @@
 
     <dependencies>
 
-        <!-- MYSQL JDBC -->
+        <!-- MYSQL connector -->
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>

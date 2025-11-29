@@ -265,7 +265,7 @@ public class ManagerMenu extends BaseMenu {
         newUser.setSurname(surname);
         
         // Get role
-        System.out.print("Role (Tester/Junior/Senior/Manager) [Tester]: ");
+        System.out.print("Role (Tester/Junior/Senior/Manager): ");
         String role = scanner.nextLine().trim();
         if (role.isEmpty()) {
             role = "Tester";
@@ -332,7 +332,8 @@ public class ManagerMenu extends BaseMenu {
         System.out.println("Username: " + user.getUsername());
         System.out.println("Name: " + user.getName() + " " + user.getSurname());
         System.out.println("Role: " + user.getRole());
-        
+
+        // need to add check ????????
         System.out.print("\nAre you sure you want to delete this user? (yes/no): ");
         String confirm = scanner.nextLine().trim().toLowerCase();
         

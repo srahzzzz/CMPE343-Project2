@@ -119,27 +119,4 @@ public class AuthService {
     private boolean isBcryptHash(String candidate) {
         return candidate.startsWith("$2a$") || candidate.startsWith("$2b$") || candidate.startsWith("$2y$");
     }
-
-    public static boolean verifyPasswordStatic(String plainText, User user) {
-        String storedHash = user.getPasswordHash();
-
-        if (storedHash == null || storedHash.isBlank()) return false;
-
-        if (storedHash.startsWith("$2a$") || storedHash.startsWith("$2b$") || storedHash.startsWith("$2y$")) {
-            return org.mindrot.jbcrypt.BCrypt.checkpw(plainText, storedHash);
-        }
-
-        // legacy plain-text
-        boolean matches = plainText.equals(storedHash);
-        if (matches) {
-            String upgradedHash = hashPassword(plainText);
-            new UserDAO().updatePasswordHash(user.getUserId(), upgradedHash);
-            user.setPasswordHash(upgradedHash);
-        }
-        return matches;
-    }
-
-
-
-
 }

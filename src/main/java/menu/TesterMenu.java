@@ -6,22 +6,20 @@ import model.Contact;
 import model.User;
 import service.AuthService;
 
-import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 /**
  * Menu for Tester role.
- * 
+ *
  * <p>Testers can:
- * - Change password
- * - Logout
- * - List all contacts
- * - Search by selected field or fields
- * - Sort results
+ * - Change password,
+ * - Logout,
+ * - List all contacts,
+ * - Search by selected field or fields,
+ * - Sort results by a user-selected field.
  */
 public class TesterMenu extends BaseMenu {
 
@@ -42,7 +40,7 @@ public class TesterMenu extends BaseMenu {
         System.out.println("1. List all contacts");
         System.out.println("2. Search by field");
         System.out.println("3. Search by multiple fields");
-        System.out.println("4. Sort contacts");
+        System.out.println("4. Sort contacts by selected field");
         System.out.println("5. Change password");
         System.out.println("0. Logout");
     }
@@ -101,13 +99,14 @@ public class TesterMenu extends BaseMenu {
         System.out.println("1. Search by First Name");
         System.out.println("2. Search by Last Name");
         System.out.println("3. Search by Phone Number");
+        System.out.println("4. Search by Email");
         System.out.print("\nSelect search type: ");
         
         String choiceInput = scanner.nextLine().trim();
         Integer choice = BaseMenu.safeParseInt(choiceInput);
         
-        if (choice == null || choice < 1 || choice > 3) {
-            System.out.println("Invalid choice. Please select 1, 2, or 3.");
+        if (choice == null || choice < 1 || choice > 4) {
+            System.out.println("Invalid choice. Please select 1, 2, 3, or 4.");
             System.out.println("Press Enter to continue...");
             scanner.nextLine();
             return;
@@ -150,6 +149,21 @@ public class TesterMenu extends BaseMenu {
                     return;
                 }
                 results = contactDAO.searchByPhone(phone);
+                break;
+
+            case 4:
+                System.out.print("Enter email (or partial): ");
+                String email = scanner.nextLine().trim();
+                if (email.isEmpty()) {
+                    System.out.println("Email cannot be empty.");
+                    System.out.println("Press Enter to continue...");
+                    scanner.nextLine();
+                    return;
+                }
+                // Re-use multi-field search for email-only searches.
+                Map<String, String> singleEmailCriteria = new HashMap<>();
+                singleEmailCriteria.put("email", email);
+                results = contactDAO.searchByMultipleFields(singleEmailCriteria);
                 break;
                 
             default:
@@ -248,7 +262,7 @@ public class TesterMenu extends BaseMenu {
         System.out.println("1. First Name");
         System.out.println("2. Last Name");
         System.out.println("3. Email");
-        System.out.println("4. Birth Date");
+        System.out.println("4. Birth Date (oldest / youngest)");
         System.out.println("5. Phone Primary");
         System.out.print("\nEnter your choice: ");
         
@@ -273,8 +287,13 @@ public class TesterMenu extends BaseMenu {
         }
         
         System.out.println("\nSort order:");
-        System.out.println("1. Ascending (A-Z, 1-9)");
-        System.out.println("2. Descending (Z-A, 9-1)");
+        if ("birth_date".equals(field)) {
+            System.out.println("1. Ascending (oldest to youngest)");
+            System.out.println("2. Descending (youngest to oldest)");
+        } else {
+            System.out.println("1. Ascending (A-Z, 1-9)");
+            System.out.println("2. Descending (Z-A, 9-1)");
+        }
         System.out.print("Enter your choice: ");
         
         String orderInput = scanner.nextLine().trim();

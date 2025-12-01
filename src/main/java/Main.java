@@ -8,8 +8,12 @@
  * @author sarah nauman
  */
 public class Main {
+
     public static void main(String[] args) {
 
+        // Play startup animation first
+
+        // Original startup messages
         System.out.println("=======================================");
         System.out.println("   ROLE-BASED CONTACT MANAGEMENT APP   ");
         System.out.println("=======================================\n");

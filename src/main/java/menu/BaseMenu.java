@@ -2,11 +2,11 @@ package menu;
 
 import model.User;
 import java.util.Scanner;
+import service.ANSI;
 
 /**
  * Base abstract class for all role-based menus.
  * Provides common functionality like displaying user info and handling logout.
- * author sarah nauman
  */
 public abstract class BaseMenu {
     protected User currentUser;
@@ -26,11 +26,12 @@ public abstract class BaseMenu {
      * Displays the menu header with user information.
      */
     protected void displayHeader() {
-        System.out.println("\n=======================================");
-        System.out.printf("   Welcome, %s %s%n",
-            currentUser.getName(),
-            currentUser.getSurname());
-        System.out.println("=======================================\n");
+        System.out.println(ANSI.CYAN + "\n=======================================" + ANSI.RESET);
+        System.out.printf(ANSI.BOLD + "   Welcome, %s %s (%s)%n" + ANSI.RESET,
+                currentUser.getName(),
+                currentUser.getSurname(),
+                currentUser.getRole());
+        System.out.println(ANSI.CYAN + "=======================================\n" + ANSI.RESET);
     }
 
     /**
@@ -44,54 +45,32 @@ public abstract class BaseMenu {
     protected abstract void handleOption(int choice);
 
     /**
-     * Main menu loop that runs until user logs out or explicitly terminates the program.
-     *
-     * <p>When the user selects the logout option (default: 0), they are asked whether they
-     * want to terminate the entire application. Answering "yes" exits the prrogam, any other
-     * answer logs out and returns control to the login screen.</p>
-     * @author sarah nauman
+     * Main menu loop that runs until user logs out.
      */
     public void run() {
         boolean running = true;
         while (running) {
             displayHeader();
             displayMenu();
-            System.out.print("\nEnter your choice: ");
+            System.out.print(ANSI.YELLOW + "\nEnter your choice: " + ANSI.RESET);
 
             try {
                 String input = scanner.nextLine();
                 Integer choice = safeParseInt(input);
 
                 if (choice == null) {
-                    System.out.println("\nInvalid input! Please enter a valid number.");
+                    System.out.println(ANSI.RED + "\nInvalid input! Please enter a valid number." + ANSI.RESET);
                     continue;
                 }
 
                 if (choice == getLogoutOption()) {
-                    String confirm;
-                    while (true) {
-                        System.out.print("\nDo you want to terminate the program? (y/n): ");
-                        confirm = scanner.nextLine().trim().toLowerCase();
-
-                        if (confirm.equals("y") || confirm.equals("n")) {
-                            break;
-                        }
-
-                        System.out.println("Invalid choice. Please enter 'y' or 'n'.");
-                    }
-
-                    if (confirm.equals("y")) {
-                        System.out.println("\nTerminating program... Goodbye!");
-                        System.exit(0);
-                    } else {
-                        System.out.println("\nLogging out... Returning to login screen...");
-                        running = false; // leave menu and go back to login loop
-                    }
+                    running = false;
+                    System.out.println(ANSI.GREEN + "\nLogging out... Goodbye!" + ANSI.RESET);
                 } else {
                     handleOption(choice);
                 }
             } catch (Exception e) {
-                System.out.println("\nError: " + e.getMessage());
+                System.out.println(ANSI.RED + "\nError: " + e.getMessage() + ANSI.RESET);
             }
         }
     }
@@ -102,8 +81,6 @@ public abstract class BaseMenu {
      * @param input the string to parse
      * @return the parsed Integer, or null if input is invalid
      */
-    // hasti
-    // invalid input check
     public static Integer safeParseInt(String input) {
         if (input == null) return null;
 
@@ -142,4 +119,3 @@ public abstract class BaseMenu {
         return 0; // Default logout option
     }
 }
-

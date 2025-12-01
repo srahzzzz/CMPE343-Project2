@@ -4,8 +4,8 @@
  * <p>This class:
  * 1. Tests the database connection,
  * 2. Starts the login service.
- *
- * It will later launch role-specific menus after authentication.
+ * 3. Launches role-specific menus after authentication.
+ * @author sarah nauman
  */
 public class Main {
     public static void main(String[] args) {

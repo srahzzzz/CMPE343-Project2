@@ -27,10 +27,9 @@ public abstract class BaseMenu {
      */
     protected void displayHeader() {
         System.out.println("\n=======================================");
-        System.out.printf("   Welcome, %s %s (%s)%n", 
-            currentUser.getName(), 
-            currentUser.getSurname(), 
-            currentUser.getRole());
+        System.out.printf("   Welcome, %s %s%n",
+            currentUser.getName(),
+            currentUser.getSurname());
         System.out.println("=======================================\n");
     }
 
@@ -50,6 +49,7 @@ public abstract class BaseMenu {
      * <p>When the user selects the logout option (default: 0), they are asked whether they
      * want to terminate the entire application. Answering "yes" exits the prrogam, any other
      * answer logs out and returns control to the login screen.</p>
+     * @author sarah nauman
      */
     public void run() {
         boolean running = true;

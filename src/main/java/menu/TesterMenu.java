@@ -20,6 +20,7 @@ import java.util.Map;
  * - List all contacts,
  * - Search by selected field or fields,
  * - Sort results by a user-selected field.
+ * @author sarah nauman
  */
 public class TesterMenu extends BaseMenu {
 

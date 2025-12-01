@@ -5,6 +5,7 @@ import dao.UserDAO;
 import model.Contact;
 import model.User;
 import service.AuthService;
+import service.ValidationUtils;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -336,46 +337,130 @@ public class JuniorMenu extends BaseMenu {
         displayContactsTable(List.of(contact));
         System.out.println("\nEnter new values (press Enter to keep current value):");
 
-        System.out.print("First Name [" + nullToEmpty(contact.getFirstName()) + "]: ");
-        String firstName = scanner.nextLine().trim();
-        if (!firstName.isEmpty()) {
+        // First name - letters only
+        while (true) {
+            System.out.print("First Name [" + nullToEmpty(contact.getFirstName()) + "] (letters only): ");
+            String firstName = scanner.nextLine().trim();
+
+            if (firstName.isEmpty()) {
+                break; // keep existing
+            }
+
+            if (!ValidationUtils.isValidName(firstName)) {
+                System.out.println("Invalid first name. Use letters only (you may use spaces, '-' or ').");
+                continue;
+            }
+
             contact.setFirstName(firstName);
+            break;
         }
 
-        System.out.print("Middle Name [" + nullToEmpty(contact.getMiddleName()) + "]: ");
-        String middleName = scanner.nextLine().trim();
-        if (!middleName.isEmpty()) {
+        // Middle name - optional, letters only if provided
+        while (true) {
+            System.out.print("Middle Name [" + nullToEmpty(contact.getMiddleName()) + "] (optional, letters only or Enter to keep): ");
+            String middleName = scanner.nextLine().trim();
+
+            if (middleName.isEmpty()) {
+                break; // keep existing
+            }
+
+            if (!ValidationUtils.isValidName(middleName)) {
+                System.out.println("Invalid middle name. Use letters only (you may use spaces, '-' or '), or press Enter to keep current value.");
+                continue;
+            }
+
             contact.setMiddleName(middleName);
+            break;
         }
 
-        System.out.print("Last Name [" + nullToEmpty(contact.getLastName()) + "]: ");
-        String lastName = scanner.nextLine().trim();
-        if (!lastName.isEmpty()) {
+        // Last name - letters only
+        while (true) {
+            System.out.print("Last Name [" + nullToEmpty(contact.getLastName()) + "] (letters only): ");
+            String lastName = scanner.nextLine().trim();
+
+            if (lastName.isEmpty()) {
+                break; // keep existing
+            }
+
+            if (!ValidationUtils.isValidName(lastName)) {
+                System.out.println("Invalid last name. Use letters only (you may use spaces, '-' or ').");
+                continue;
+            }
+
             contact.setLastName(lastName);
+            break;
         }
 
-        System.out.print("Nickname [" + nullToEmpty(contact.getNickname()) + "]: ");
-        String nickname = scanner.nextLine().trim();
-        if (!nickname.isEmpty()) {
+        // Nickname - optional, letters/digits/basic chars
+        while (true) {
+            System.out.print("Nickname [" + nullToEmpty(contact.getNickname()) + "] (optional, letters/digits/-/_ or Enter to keep): ");
+            String nickname = scanner.nextLine().trim();
+
+            if (nickname.isEmpty()) {
+                break; // keep existing
+            }
+
+            if (!ValidationUtils.isValidNickname(nickname)) {
+                System.out.println("Invalid nickname. Allowed characters: letters, digits, spaces, '-' and '_', or press Enter to keep current value.");
+                continue;
+            }
+
             contact.setNickname(nickname);
+            break;
         }
 
-        System.out.print("Phone 1 [" + nullToEmpty(contact.getPhonePrimary()) + "]: ");
-        String phone1 = scanner.nextLine().trim();
-        if (!phone1.isEmpty()) {
+        // Phone 1 - digits only, at least 10 digits
+        while (true) {
+            System.out.print("Phone 1 [" + nullToEmpty(contact.getPhonePrimary()) + "] (digits only, min 10): ");
+            String phone1 = scanner.nextLine().trim();
+
+            if (phone1.isEmpty()) {
+                break; // keep existing
+            }
+
+            if (!ValidationUtils.isValidPhone(phone1)) {
+                System.out.println("Invalid phone number. Use digits only and at least 10 digits.");
+                continue;
+            }
+
             contact.setPhonePrimary(phone1);
+            break;
         }
 
-        System.out.print("Phone 2 [" + nullToEmpty(contact.getPhoneSecondary()) + "]: ");
-        String phone2 = scanner.nextLine().trim();
-        if (!phone2.isEmpty()) {
+        // Phone 2 - optional
+        while (true) {
+            System.out.print("Phone 2 [" + nullToEmpty(contact.getPhoneSecondary()) + "] (optional, digits only, min 10 or Enter to keep): ");
+            String phone2 = scanner.nextLine().trim();
+
+            if (phone2.isEmpty()) {
+                break; // keep existing
+            }
+
+            if (!ValidationUtils.isValidPhone(phone2)) {
+                System.out.println("Invalid phone number. Use digits only and at least 10 digits, or press Enter to keep the current value.");
+                continue;
+            }
+
             contact.setPhoneSecondary(phone2);
+            break;
         }
 
-        System.out.print("Email [" + nullToEmpty(contact.getEmail()) + "]: ");
-        String email = scanner.nextLine().trim();
-        if (!email.isEmpty()) {
+        // Email - must have basic structure
+        while (true) {
+            System.out.print("Email [" + nullToEmpty(contact.getEmail()) + "]: ");
+            String email = scanner.nextLine().trim();
+
+            if (email.isEmpty()) {
+                break; // keep existing
+            }
+
+            if (!ValidationUtils.isValidEmail(email)) {
+                System.out.println("Invalid email. It must contain '@', a domain with '.', and no spaces (e.g., user@example.com).");
+                continue;
+            }
+
             contact.setEmail(email);
+            break;
         }
 
         System.out.print("LinkedIn URL [" + nullToEmpty(contact.getLinkedinUrl()) + "]: ");
@@ -387,14 +472,28 @@ public class JuniorMenu extends BaseMenu {
         String currentBirthDate = contact.getBirthDate() != null
                 ? contact.getBirthDate().format(dateFormatter)
                 : "N/A";
-        System.out.print("Birth Date (" + currentBirthDate + ") [yyyy-MM-dd or Enter to keep]: ");
-        String birthDateInput = scanner.nextLine().trim();
-        if (!birthDateInput.isEmpty()) {
+
+        while (true) {
+            System.out.print("Birth Date (" + currentBirthDate + ") [yyyy-MM-dd or Enter to keep]: ");
+            String birthDateInput = scanner.nextLine().trim();
+
+            if (birthDateInput.isEmpty()) {
+                // Keep existing value
+                break;
+            }
+
+            // Enforce strict yyyy-MM-dd pattern (e.g., 2002-05-05)
+            if (!birthDateInput.matches("\\d{4}-\\d{2}-\\d{2}")) {
+                System.out.println("Invalid format. Please enter the date exactly as yyyy-MM-dd (e.g., 2002-05-05).");
+                continue;
+            }
+
             try {
                 LocalDate birthDate = LocalDate.parse(birthDateInput, dateFormatter);
                 contact.setBirthDate(birthDate);
+                break;
             } catch (DateTimeParseException e) {
-                System.out.println("Invalid date format. Keeping existing birth date.");
+                System.out.println("Invalid date value. Please enter a real calendar date in yyyy-MM-dd format.");
             }
         }
 

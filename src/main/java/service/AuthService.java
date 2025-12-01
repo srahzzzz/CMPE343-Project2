@@ -14,6 +14,7 @@ import java.util.Scanner;
  * credentials, checks them against the database via {@link UserDAO}, and
  * prints basic next-step information. The class will later be extended to
  * dispatch to role-specific menus once the rest of the application exists.
+ * author sarah nauman
  */
 public class AuthService {
 
@@ -22,6 +23,10 @@ public class AuthService {
 
     /**
      * Starts the login loop and launches appropriate menu based on role.
+     *
+     * <p>The application keeps running until the user explicitly chooses to
+     * terminate it from within a menu (logout yes to terminate). After a
+     * normal logout, control returns here and the user can log in again.</p>
      */
     public void startLogin() {
         while (true) {
@@ -45,9 +50,10 @@ public class AuthService {
                 continue;
             }
 
-            // Login successful - launch role-specific menu
+            // Login successful - launch role-specific menu.
+            // When the menu returns (user chose logout without terminating),
+            // the loop continues and prompts for login again.
             launchMenu(user);
-            break;
         }
     }
 

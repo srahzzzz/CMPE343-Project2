@@ -6,6 +6,7 @@ import java.util.Scanner;
 /**
  * Base abstract class for all role-based menus.
  * Provides common functionality like displaying user info and handling logout.
+ * author sarah nauman
  */
 public abstract class BaseMenu {
     protected User currentUser;
@@ -44,7 +45,11 @@ public abstract class BaseMenu {
     protected abstract void handleOption(int choice);
 
     /**
-     * Main menu loop that runs until user logs out.
+     * Main menu loop that runs until user logs out or explicitly terminates the program.
+     *
+     * <p>When the user selects the logout option (default: 0), they are asked whether they
+     * want to terminate the entire application. Answering "yes" exits the prrogam, any other
+     * answer logs out and returns control to the login screen.</p>
      */
     public void run() {
         boolean running = true;
@@ -52,19 +57,36 @@ public abstract class BaseMenu {
             displayHeader();
             displayMenu();
             System.out.print("\nEnter your choice: ");
-            
+
             try {
                 String input = scanner.nextLine();
                 Integer choice = safeParseInt(input);
-                
+
                 if (choice == null) {
                     System.out.println("\nInvalid input! Please enter a valid number.");
                     continue;
                 }
-                
+
                 if (choice == getLogoutOption()) {
-                    running = false;
-                    System.out.println("\nLogging out... Goodbye!");
+                    String confirm;
+                    while (true) {
+                        System.out.print("\nDo you want to terminate the program? (y/n): ");
+                        confirm = scanner.nextLine().trim().toLowerCase();
+
+                        if (confirm.equals("y") || confirm.equals("n")) {
+                            break;
+                        }
+
+                        System.out.println("Invalid choice. Please enter 'y' or 'n'.");
+                    }
+
+                    if (confirm.equals("y")) {
+                        System.out.println("\nTerminating program... Goodbye!");
+                        System.exit(0);
+                    } else {
+                        System.out.println("\nLogging out... Returning to login screen...");
+                        running = false; // leave menu and go back to login loop
+                    }
                 } else {
                     handleOption(choice);
                 }

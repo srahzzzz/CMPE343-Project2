@@ -1,6 +1,7 @@
 package menu;
 
 import model.User;
+import util.ColorUtils;
 import java.util.Scanner;
 
 /**
@@ -26,11 +27,42 @@ public abstract class BaseMenu {
      * Displays the menu header with user information.
      */
     protected void displayHeader() {
-        System.out.println("\n=======================================");
-        System.out.printf("   Welcome, %s %s%n",
+        String roleColor = getRoleHeaderColor();
+        System.out.println("\n" + ColorUtils.colorize("=======================================", roleColor));
+        System.out.printf(ColorUtils.colorize("   Welcome, %s %s%n", roleColor),
             currentUser.getName(),
             currentUser.getSurname());
-        System.out.println("=======================================\n");
+        System.out.println(ColorUtils.colorize("=======================================\n", roleColor));
+    }
+    
+    /**
+     * Gets the role-specific header color.
+     * @return ANSI color code for the role
+     */
+    protected String getRoleHeaderColor() {
+        String role = currentUser.getRole();
+        switch (role) {
+            case "Tester": return ColorUtils.BOLD + ColorUtils.BRIGHT_CYAN;
+            case "Junior": return ColorUtils.BOLD + ColorUtils.BRIGHT_MAGENTA;
+            case "Senior": return ColorUtils.BOLD + ColorUtils.BRIGHT_GREEN;
+            case "Manager": return ColorUtils.BOLD + ColorUtils.BRIGHT_YELLOW;
+            default: return ColorUtils.BOLD + ColorUtils.BRIGHT_CYAN;
+        }
+    }
+    
+    /**
+     * Gets the role-specific prompt color.
+     * @return ANSI color code for prompts
+     */
+    protected String getRolePromptColor() {
+        String role = currentUser.getRole();
+        switch (role) {
+            case "Tester": return ColorUtils.BRIGHT_CYAN;
+            case "Junior": return ColorUtils.BRIGHT_MAGENTA;
+            case "Senior": return ColorUtils.BRIGHT_GREEN;
+            case "Manager": return ColorUtils.BRIGHT_YELLOW;
+            default: return ColorUtils.BRIGHT_BLUE;
+        }
     }
 
     /**
@@ -56,42 +88,42 @@ public abstract class BaseMenu {
         while (running) {
             displayHeader();
             displayMenu();
-            System.out.print("\nEnter your choice: ");
+            System.out.print("\n" + ColorUtils.colorize("Enter your choice: ", getRolePromptColor()));
 
             try {
                 String input = scanner.nextLine();
                 Integer choice = safeParseInt(input);
 
                 if (choice == null) {
-                    System.out.println("\nInvalid input! Please enter a valid number.");
+                    System.out.println("\n" + ColorUtils.error("Invalid input! Please enter a valid number."));
                     continue;
                 }
 
                 if (choice == getLogoutOption()) {
                     String confirm;
                     while (true) {
-                        System.out.print("\nDo you want to terminate the program? (y/n): ");
+                        System.out.print("\n" + ColorUtils.colorize("Do you want to terminate the program? (y/n): ", getRolePromptColor()));
                         confirm = scanner.nextLine().trim().toLowerCase();
 
                         if (confirm.equals("y") || confirm.equals("n")) {
                             break;
                         }
 
-                        System.out.println("Invalid choice. Please enter 'y' or 'n'.");
+                        System.out.println(ColorUtils.error("Invalid choice. Please enter 'y' or 'n'."));
                     }
 
                     if (confirm.equals("y")) {
-                        System.out.println("\nTerminating program... Goodbye!");
+                        System.out.println("\n" + ColorUtils.info("Terminating program... Goodbye!"));
                         System.exit(0);
                     } else {
-                        System.out.println("\nLogging out... Returning to login screen...");
+                        System.out.println("\n" + ColorUtils.info("Logging out... Returning to login screen..."));
                         running = false; // leave menu and go back to login loop
                     }
                 } else {
                     handleOption(choice);
                 }
             } catch (Exception e) {
-                System.out.println("\nError: " + e.getMessage());
+                System.out.println("\n" + ColorUtils.error("Error: " + e.getMessage()));
             }
         }
     }

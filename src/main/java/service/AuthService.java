@@ -4,6 +4,7 @@ import dao.UserDAO;
 import model.User;
 import menu.*;
 import org.mindrot.jbcrypt.BCrypt;
+import util.ColorUtils;
 
 import java.util.Scanner;
 
@@ -30,23 +31,23 @@ public class AuthService {
      */
     public void startLogin() {
         while (true) {
-            System.out.println("---------- LOGIN ----------");
+            System.out.println(ColorUtils.header("---------- LOGIN ----------"));
 
-            System.out.print("Username: ");
+            System.out.print(ColorUtils.prompt("Username: "));
             String username = scanner.nextLine().trim();
 
-            System.out.print("Password: ");
+            System.out.print(ColorUtils.prompt("Password: "));
             String password = scanner.nextLine().trim();
 
             User user = userDAO.findByUsername(username);
 
             if (user == null) {
-                System.out.println("User not found. Please try again.\n");
+                System.out.println(ColorUtils.error("User not found. Please try again.\n"));
                 continue;
             }
 
             if (!verifyPassword(password, user)) {
-                System.out.println("Invalid password. Please try again.\n");
+                System.out.println(ColorUtils.error("Invalid password. Please try again.\n"));
                 continue;
             }
 
@@ -80,7 +81,7 @@ public class AuthService {
                 menu = new ManagerMenu(user);
                 break;
             default:
-                System.out.println("Unknown role: " + role);
+                System.out.println(ColorUtils.error("Unknown role: " + role));
                 return;
         }
 
@@ -117,7 +118,7 @@ public class AuthService {
             String upgradedHash = hashPassword(plainText);
             userDAO.updatePasswordHash(user.getUserId(), upgradedHash);
             user.setPasswordHash(upgradedHash);
-            System.out.println("Password upgraded to secure hash.");
+            System.out.println(ColorUtils.info("Password upgraded to secure hash."));
         }
         return matches;
     }

@@ -5,6 +5,7 @@ import dao.UserDAO;
 import model.Contact;
 import model.User;
 import service.AuthService;
+import util.ColorUtils;
 
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
@@ -38,12 +39,12 @@ public class TesterMenu extends BaseMenu {
 
     @Override
     protected void displayMenu() {
-        System.out.println("1. List all contacts");
-        System.out.println("2. Search by field");
-        System.out.println("3. Search by multiple fields");
-        System.out.println("4. Sort contacts by selected field");
-        System.out.println("5. Change password");
-        System.out.println("0. Logout");
+        System.out.println(ColorUtils.testerMenuOption("1. List all contacts"));
+        System.out.println(ColorUtils.testerMenuOption("2. Search by field"));
+        System.out.println(ColorUtils.testerMenuOption("3. Search by multiple fields"));
+        System.out.println(ColorUtils.testerMenuOption("4. Sort contacts by selected field"));
+        System.out.println(ColorUtils.testerMenuOption("5. Change password"));
+        System.out.println(ColorUtils.testerMenuOption("0. Logout"));
     }
 
     @Override
@@ -65,7 +66,7 @@ public class TesterMenu extends BaseMenu {
                 changePassword();
                 break;
             default:
-                System.out.println("\nInvalid option! Please try again.");
+                System.out.println("\n" + ColorUtils.error("Invalid option! Please try again."));
         }
     }
 
@@ -74,19 +75,19 @@ public class TesterMenu extends BaseMenu {
      * Displays all contact records in a formatted table.
      */
     private void listAllContacts() {
-        System.out.println("\n--- List All Contacts ---");
-        System.out.println("=======================================");
+        System.out.println("\n" + ColorUtils.header("--- List All Contacts ---"));
+        System.out.println(ColorUtils.header("======================================="));
         
         List<Contact> contacts = contactDAO.findAll();
         
         if (contacts.isEmpty()) {
-            System.out.println("No contacts found in the database.");
+            System.out.println(ColorUtils.warning("No contacts found in the database."));
         } else {
             displayContactsTable(contacts);
-            System.out.println("Total contacts: " + contacts.size());
+            System.out.println(ColorUtils.info("Total contacts: " + contacts.size()));
         }
         
-        System.out.println("\nPress Enter to continue...");
+        System.out.println("\n" + ColorUtils.testerPrompt("Press Enter to continue..."));
         scanner.nextLine();
     }
 
@@ -95,20 +96,20 @@ public class TesterMenu extends BaseMenu {
      * Allows searching by first name, last name, or phone number.
      */
     private void searchByField() {
-        System.out.println("\n--- Search by Field ---");
-        System.out.println("=======================================");
-        System.out.println("1. Search by First Name");
-        System.out.println("2. Search by Last Name");
-        System.out.println("3. Search by Phone Number");
-        System.out.println("4. Search by Email");
-        System.out.print("\nSelect search type: ");
+        System.out.println("\n" + ColorUtils.header("--- Search by Field ---"));
+        System.out.println(ColorUtils.header("======================================="));
+        System.out.println(ColorUtils.testerMenuOption("1. Search by First Name"));
+        System.out.println(ColorUtils.testerMenuOption("2. Search by Last Name"));
+        System.out.println(ColorUtils.testerMenuOption("3. Search by Phone Number"));
+        System.out.println(ColorUtils.testerMenuOption("4. Search by Email"));
+        System.out.print("\n" + ColorUtils.testerPrompt("Select search type: "));
         
         String choiceInput = scanner.nextLine().trim();
         Integer choice = BaseMenu.safeParseInt(choiceInput);
         
         if (choice == null || choice < 1 || choice > 4) {
-            System.out.println("Invalid choice. Please select 1, 2, 3, or 4.");
-            System.out.println("Press Enter to continue...");
+            System.out.println(ColorUtils.error("Invalid choice. Please select 1, 2, 3, or 4."));
+            System.out.println(ColorUtils.testerPrompt("Press Enter to continue..."));
             scanner.nextLine();
             return;
         }
@@ -117,11 +118,11 @@ public class TesterMenu extends BaseMenu {
         
         switch (choice) {
             case 1:
-                System.out.print("Enter first name (or partial): ");
+                System.out.print(ColorUtils.testerPrompt("Enter first name (or partial): "));
                 String firstName = scanner.nextLine().trim();
                 if (firstName.isEmpty()) {
-                    System.out.println("First name cannot be empty.");
-                    System.out.println("Press Enter to continue...");
+                    System.out.println(ColorUtils.error("First name cannot be empty."));
+                    System.out.println(ColorUtils.testerPrompt("Press Enter to continue..."));
                     scanner.nextLine();
                     return;
                 }
@@ -129,11 +130,11 @@ public class TesterMenu extends BaseMenu {
                 break;
                 
             case 2:
-                System.out.print("Enter last name (or partial): ");
+                System.out.print(ColorUtils.testerPrompt("Enter last name (or partial): "));
                 String lastName = scanner.nextLine().trim();
                 if (lastName.isEmpty()) {
-                    System.out.println("Last name cannot be empty.");
-                    System.out.println("Press Enter to continue...");
+                    System.out.println(ColorUtils.error("Last name cannot be empty."));
+                    System.out.println(ColorUtils.testerPrompt("Press Enter to continue..."));
                     scanner.nextLine();
                     return;
                 }
@@ -141,11 +142,11 @@ public class TesterMenu extends BaseMenu {
                 break;
                 
             case 3:
-                System.out.print("Enter phone number (or partial): ");
+                System.out.print(ColorUtils.testerPrompt("Enter phone number (or partial): "));
                 String phone = scanner.nextLine().trim();
                 if (phone.isEmpty()) {
-                    System.out.println("Phone number cannot be empty.");
-                    System.out.println("Press Enter to continue...");
+                    System.out.println(ColorUtils.error("Phone number cannot be empty."));
+                    System.out.println(ColorUtils.testerPrompt("Press Enter to continue..."));
                     scanner.nextLine();
                     return;
                 }
@@ -153,11 +154,11 @@ public class TesterMenu extends BaseMenu {
                 break;
 
             case 4:
-                System.out.print("Enter email (or partial): ");
+                System.out.print(ColorUtils.testerPrompt("Enter email (or partial): "));
                 String email = scanner.nextLine().trim();
                 if (email.isEmpty()) {
-                    System.out.println("Email cannot be empty.");
-                    System.out.println("Press Enter to continue...");
+                    System.out.println(ColorUtils.error("Email cannot be empty."));
+                    System.out.println(ColorUtils.testerPrompt("Press Enter to continue..."));
                     scanner.nextLine();
                     return;
                 }
@@ -172,14 +173,14 @@ public class TesterMenu extends BaseMenu {
         }
         
         if (results.isEmpty()) {
-            System.out.println("\nNo contacts found matching your search criteria.");
+            System.out.println("\n" + ColorUtils.warning("No contacts found matching your search criteria."));
         } else {
-            System.out.println("\nSearch Results:");
+            System.out.println("\n" + ColorUtils.header("Search Results:"));
             displayContactsTable(results);
-            System.out.println("Found " + results.size() + " contact(s).");
+            System.out.println(ColorUtils.success("Found " + results.size() + " contact(s)."));
         }
         
-        System.out.println("\nPress Enter to continue...");
+        System.out.println("\n" + ColorUtils.testerPrompt("Press Enter to continue..."));
         scanner.nextLine();
     }
 
@@ -188,52 +189,52 @@ public class TesterMenu extends BaseMenu {
      * Allows combining multiple search conditions (e.g., name + birth month, phone + email).
      */
     private void searchByMultipleFields() {
-        System.out.println("\n--- Search by Multiple Fields ---");
-        System.out.println("=======================================");
-        System.out.println("Enter search criteria (press Enter to skip a field):\n");
+        System.out.println("\n" + ColorUtils.header("--- Search by Multiple Fields ---"));
+        System.out.println(ColorUtils.header("======================================="));
+        System.out.println(ColorUtils.info("Enter search criteria (press Enter to skip a field):\n"));
         
         Map<String, String> criteria = new HashMap<>();
         
-        System.out.print("First Name: ");
+        System.out.print(ColorUtils.testerPrompt("First Name: "));
         String firstName = scanner.nextLine().trim();
         if (!firstName.isEmpty()) {
             criteria.put("first_name", firstName);
         }
         
-        System.out.print("Last Name: ");
+        System.out.print(ColorUtils.testerPrompt("Last Name: "));
         String lastName = scanner.nextLine().trim();
         if (!lastName.isEmpty()) {
             criteria.put("last_name", lastName);
         }
         
-        System.out.print("Phone Number: ");
+        System.out.print(ColorUtils.testerPrompt("Phone Number: "));
         String phone = scanner.nextLine().trim();
         if (!phone.isEmpty()) {
             criteria.put("phone", phone);
         }
         
-        System.out.print("Email (partial): ");
+        System.out.print(ColorUtils.testerPrompt("Email (partial): "));
         String email = scanner.nextLine().trim();
         if (!email.isEmpty()) {
             criteria.put("email", email);
         }
         
-        System.out.print("Birth Month (1-12): ");
+        System.out.print(ColorUtils.testerPrompt("Birth Month (1-12): "));
         String birthMonth = scanner.nextLine().trim();
         if (!birthMonth.isEmpty()) {
             Integer month = BaseMenu.safeParseInt(birthMonth);
             if (month != null && month >= 1 && month <= 12) {
                 criteria.put("birth_month", month.toString());
             } else {
-                System.out.println("Invalid month. Skipping birth month filter.");
+                System.out.println(ColorUtils.warning("Invalid month. Skipping birth month filter."));
             }
         }
         
     
 
         if (criteria.isEmpty()) {
-            System.out.println("\nNo search criteria provided. Please enter at least one field.");
-            System.out.println("Press Enter to continue...");
+            System.out.println("\n" + ColorUtils.error("No search criteria provided. Please enter at least one field."));
+            System.out.println(ColorUtils.testerPrompt("Press Enter to continue..."));
             scanner.nextLine();
             return;
         }
@@ -241,14 +242,14 @@ public class TesterMenu extends BaseMenu {
         List<Contact> results = contactDAO.searchByMultipleFields(criteria);
         
         if (results.isEmpty()) {
-            System.out.println("\nNo contacts found matching all your search criteria.");
+            System.out.println("\n" + ColorUtils.warning("No contacts found matching all your search criteria."));
         } else {
-            System.out.println("\nSearch Results:");
+            System.out.println("\n" + ColorUtils.header("Search Results:"));
             displayContactsTable(results);
-            System.out.println("Found " + results.size() + " contact(s) matching all criteria.");
+            System.out.println(ColorUtils.success("Found " + results.size() + " contact(s) matching all criteria."));
         }
         
-        System.out.println("\nPress Enter to continue...");
+        System.out.println("\n" + ColorUtils.testerPrompt("Press Enter to continue..."));
         scanner.nextLine();
     }
 
@@ -257,22 +258,22 @@ public class TesterMenu extends BaseMenu {
      * Allows sorting by any contact field (name, email, birth date, etc.).
      */
     private void sortContacts() {
-        System.out.println("\n--- Sort Contacts ---");
-        System.out.println("=======================================");
-        System.out.println("Select field to sort by:");
-        System.out.println("1. First Name");
-        System.out.println("2. Last Name");
-        System.out.println("3. Email");
-        System.out.println("4. Birth Date (oldest / youngest)");
-        System.out.println("5. Phone Primary");
-        System.out.print("\nEnter your choice: ");
+        System.out.println("\n" + ColorUtils.header("--- Sort Contacts ---"));
+        System.out.println(ColorUtils.header("======================================="));
+        System.out.println(ColorUtils.info("Select field to sort by:"));
+        System.out.println(ColorUtils.testerMenuOption("1. First Name"));
+        System.out.println(ColorUtils.testerMenuOption("2. Last Name"));
+        System.out.println(ColorUtils.testerMenuOption("3. Email"));
+        System.out.println(ColorUtils.testerMenuOption("4. Birth Date (oldest / youngest)"));
+        System.out.println(ColorUtils.testerMenuOption("5. Phone Primary"));
+        System.out.print("\n" + ColorUtils.testerPrompt("Enter your choice: "));
         
         String choiceInput = scanner.nextLine().trim();
         Integer choice = BaseMenu.safeParseInt(choiceInput);
         
         if (choice == null || choice < 1 || choice > 5) {
-            System.out.println("Invalid choice.");
-            System.out.println("Press Enter to continue...");
+            System.out.println(ColorUtils.error("Invalid choice."));
+            System.out.println(ColorUtils.testerPrompt("Press Enter to continue..."));
             scanner.nextLine();
             return;
         }
@@ -287,15 +288,15 @@ public class TesterMenu extends BaseMenu {
             default: field = "contact_id";
         }
         
-        System.out.println("\nSort order:");
+        System.out.println("\n" + ColorUtils.info("Sort order:"));
         if ("birth_date".equals(field)) {
-            System.out.println("1. Ascending (oldest to youngest)");
-            System.out.println("2. Descending (youngest to oldest)");
+            System.out.println(ColorUtils.testerMenuOption("1. Ascending (oldest to youngest)"));
+            System.out.println(ColorUtils.testerMenuOption("2. Descending (youngest to oldest)"));
         } else {
-            System.out.println("1. Ascending (A-Z, 1-9)");
-            System.out.println("2. Descending (Z-A, 9-1)");
+            System.out.println(ColorUtils.testerMenuOption("1. Ascending (A-Z, 1-9)"));
+            System.out.println(ColorUtils.testerMenuOption("2. Descending (Z-A, 9-1)"));
         }
-        System.out.print("Enter your choice: ");
+        System.out.print(ColorUtils.testerPrompt("Enter your choice: "));
         
         String orderInput = scanner.nextLine().trim();
         Integer orderChoice = BaseMenu.safeParseInt(orderInput);
@@ -308,14 +309,14 @@ public class TesterMenu extends BaseMenu {
         List<Contact> contacts = contactDAO.findAllSorted(field, ascending);
         
         if (contacts.isEmpty()) {
-            System.out.println("No contacts found.");
+            System.out.println(ColorUtils.warning("No contacts found."));
         } else {
-            System.out.println("\nSorted Contacts:");
+            System.out.println("\n" + ColorUtils.header("Sorted Contacts:"));
             displayContactsTable(contacts);
-            System.out.println("Total contacts: " + contacts.size());
+            System.out.println(ColorUtils.info("Total contacts: " + contacts.size()));
         }
         
-        System.out.println("\nPress Enter to continue...");
+        System.out.println("\n" + ColorUtils.testerPrompt("Press Enter to continue..."));
         scanner.nextLine();
     }
 
@@ -324,19 +325,19 @@ public class TesterMenu extends BaseMenu {
      * Verifies current password before allowing change.
      */
     private void changePassword() {
-        System.out.println("\n--- Change Password ---");
-        System.out.println("=======================================");
+        System.out.println("\n" + ColorUtils.header("--- Change Password ---"));
+        System.out.println(ColorUtils.header("======================================="));
         
         UserDAO userDAO = new UserDAO();
         
-        System.out.print("Enter current password: ");
+        System.out.print(ColorUtils.testerPrompt("Enter current password: "));
         String currentPassword = scanner.nextLine().trim();
         
         // Verify current password
         User currentUserFromDB = userDAO.findById(currentUser.getUserId());
         if (currentUserFromDB == null) {
-            System.out.println("Error: Could not retrieve user information.");
-            System.out.println("Press Enter to continue...");
+            System.out.println(ColorUtils.error("Error: Could not retrieve user information."));
+            System.out.println(ColorUtils.testerPrompt("Press Enter to continue..."));
             scanner.nextLine();
             return;
         }
@@ -354,28 +355,28 @@ public class TesterMenu extends BaseMenu {
         }
         
         if (!passwordMatches) {
-            System.out.println("Current password is incorrect.");
-            System.out.println("Press Enter to continue...");
+            System.out.println(ColorUtils.error("Current password is incorrect."));
+            System.out.println(ColorUtils.testerPrompt("Press Enter to continue..."));
             scanner.nextLine();
             return;
         }
         
         // Get new password
-        System.out.print("Enter new password: ");
+        System.out.print(ColorUtils.testerPrompt("Enter new password: "));
         String newPassword = scanner.nextLine().trim();
         if (newPassword.isEmpty()) {
-            System.out.println("Password cannot be empty.");
-            System.out.println("Press Enter to continue...");
+            System.out.println(ColorUtils.error("Password cannot be empty."));
+            System.out.println(ColorUtils.testerPrompt("Press Enter to continue..."));
             scanner.nextLine();
             return;
         }
         
-        System.out.print("Confirm new password: ");
+        System.out.print(ColorUtils.testerPrompt("Confirm new password: "));
         String confirmPassword = scanner.nextLine().trim();
         
         if (!newPassword.equals(confirmPassword)) {
-            System.out.println("Passwords do not match. Password not changed.");
-            System.out.println("Press Enter to continue...");
+            System.out.println(ColorUtils.error("Passwords do not match. Password not changed."));
+            System.out.println(ColorUtils.testerPrompt("Press Enter to continue..."));
             scanner.nextLine();
             return;
         }
@@ -383,11 +384,11 @@ public class TesterMenu extends BaseMenu {
         // Update password
         String hashedPassword = AuthService.hashPassword(newPassword);
         userDAO.updatePasswordHash(currentUser.getUserId(), hashedPassword);
-        System.out.println("Password changed successfully!");
+        System.out.println(ColorUtils.success("Password changed successfully!"));
         // Update current user object
         currentUser.setPasswordHash(hashedPassword);
         
-        System.out.println("Press Enter to continue...");
+        System.out.println(ColorUtils.testerPrompt("Press Enter to continue..."));
         scanner.nextLine();
     }
 
@@ -399,10 +400,10 @@ public class TesterMenu extends BaseMenu {
      */
     private void displayContactsTable(List<Contact> contacts) {
         // Display header with all fields
-        System.out.printf("%-6s %-15s %-15s %-15s %-15s %-15s %-15s %-25s %-25s %-12s%n",
+        System.out.printf(ColorUtils.header("%-6s %-15s %-15s %-15s %-15s %-15s %-15s %-25s %-25s %-12s%n"),
             "ID", "First Name", "Middle Name", "Last Name", "Nickname", 
             "Phone 1", "Phone 2", "Email", "LinkedIn", "Birth Date");
-        System.out.println("--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
+        System.out.println(ColorUtils.colorize("--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------", ColorUtils.CYAN));
         
         DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         
@@ -441,7 +442,7 @@ public class TesterMenu extends BaseMenu {
                 birthDate);
         }
         
-        System.out.println("--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
+        System.out.println(ColorUtils.colorize("--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------", ColorUtils.CYAN));
     }
 }
 

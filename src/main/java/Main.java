@@ -1,6 +1,6 @@
+import util.ColorUtils;
+
 /**
- * THIS IS A TESTER RIGHT NOW
- *
  * <p>This class:
  * 1. Tests the database connection,
  * 2. Starts the login service.
@@ -10,15 +10,15 @@
 public class Main {
     public static void main(String[] args) {
 
-        System.out.println("=======================================");
-        System.out.println("   ROLE-BASED CONTACT MANAGEMENT APP   ");
-        System.out.println("=======================================\n");
+        System.out.println(ColorUtils.header("======================================="));
+        System.out.println(ColorUtils.header("   ROLE-BASED CONTACT MANAGEMENT APP   "));
+        System.out.println(ColorUtils.header("=======================================\n"));
 
         // Test DB connection
         if (db.DBConnection.getConnection() != null) {
-            System.out.println("Database connection successful.\n");
+            System.out.println(ColorUtils.success("Database connection successful.\n"));
         } else {
-            System.out.println("Database connection failed. Exiting...");
+            System.out.println(ColorUtils.error("Database connection failed. Exiting..."));
             return;
         }
 

@@ -6,6 +6,7 @@ import model.Contact;
 import model.User;
 import service.AuthService;
 import service.ValidationUtils;
+import util.ColorUtils;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -45,13 +46,13 @@ public class JuniorMenu extends BaseMenu {
 
     @Override
     protected void displayMenu() {
-        System.out.println("1. List all contacts");
-        System.out.println("2. Search by field");
-        System.out.println("3. Search by multiple fields");
-        System.out.println("4. Sort contacts");
-        System.out.println("5. Update contact");
-        System.out.println("6. Change password");
-        System.out.println("0. Logout");
+        System.out.println(ColorUtils.juniorMenuOption("1. List all contacts"));
+        System.out.println(ColorUtils.juniorMenuOption("2. Search by field"));
+        System.out.println(ColorUtils.juniorMenuOption("3. Search by multiple fields"));
+        System.out.println(ColorUtils.juniorMenuOption("4. Sort contacts"));
+        System.out.println(ColorUtils.juniorMenuOption("5. Update contact"));
+        System.out.println(ColorUtils.juniorMenuOption("6. Change password"));
+        System.out.println(ColorUtils.juniorMenuOption("0. Logout"));
     }
 
     @Override
@@ -76,42 +77,42 @@ public class JuniorMenu extends BaseMenu {
                 changePassword();
                 break;
             default:
-                System.out.println("\nInvalid option! Please try again.");
+                System.out.println("\n" + ColorUtils.error("Invalid option! Please try again."));
         }
     }
 
     private void listAllContacts() {
-        System.out.println("\n--- List All Contacts ---");
-        System.out.println("=======================================");
-
+        System.out.println("\n" + ColorUtils.header("--- List All Contacts ---"));
+        System.out.println(ColorUtils.header("======================================="));
+        
         List<Contact> contacts = contactDAO.findAll();
-
+        
         if (contacts.isEmpty()) {
-            System.out.println("No contacts found in the database.");
+            System.out.println(ColorUtils.warning("No contacts found in the database."));
         } else {
             displayContactsTable(contacts);
-            System.out.println("Total contacts: " + contacts.size());
+            System.out.println(ColorUtils.info("Total contacts: " + contacts.size()));
         }
-
-        System.out.println("\nPress Enter to continue...");
+        
+        System.out.println("\n" + ColorUtils.juniorPrompt("Press Enter to continue..."));
         scanner.nextLine();
     }
 
     private void searchByField() {
-        System.out.println("\n--- Search by Field ---");
-        System.out.println("=======================================");
-        System.out.println("1. Search by First Name");
-        System.out.println("2. Search by Last Name");
-        System.out.println("3. Search by Phone Number");
-        System.out.println("4. Search by Email");
-        System.out.print("\nSelect search type: ");
-
+        System.out.println("\n" + ColorUtils.header("--- Search by Field ---"));
+        System.out.println(ColorUtils.header("======================================="));
+        System.out.println(ColorUtils.juniorMenuOption("1. Search by First Name"));
+        System.out.println(ColorUtils.juniorMenuOption("2. Search by Last Name"));
+        System.out.println(ColorUtils.juniorMenuOption("3. Search by Phone Number"));
+        System.out.println(ColorUtils.juniorMenuOption("4. Search by Email"));
+        System.out.print("\n" + ColorUtils.juniorPrompt("Select search type: "));
+        
         String choiceInput = scanner.nextLine().trim();
         Integer choice = BaseMenu.safeParseInt(choiceInput);
-
+        
         if (choice == null || choice < 1 || choice > 4) {
-            System.out.println("Invalid choice. Please select 1, 2, 3, or 4.");
-            System.out.println("Press Enter to continue...");
+            System.out.println(ColorUtils.error("Invalid choice. Please select 1, 2, 3, or 4."));
+            System.out.println(ColorUtils.juniorPrompt("Press Enter to continue..."));
             scanner.nextLine();
             return;
         }
@@ -120,11 +121,11 @@ public class JuniorMenu extends BaseMenu {
 
         switch (choice) {
             case 1:
-                System.out.print("Enter first name (or partial): ");
+                System.out.print(ColorUtils.juniorPrompt("Enter first name (or partial): "));
                 String firstName = scanner.nextLine().trim();
                 if (firstName.isEmpty()) {
-                    System.out.println("First name cannot be empty.");
-                    System.out.println("Press Enter to continue...");
+                    System.out.println(ColorUtils.error("First name cannot be empty."));
+                    System.out.println(ColorUtils.juniorPrompt("Press Enter to continue..."));
                     scanner.nextLine();
                     return;
                 }
@@ -132,11 +133,11 @@ public class JuniorMenu extends BaseMenu {
                 break;
 
             case 2:
-                System.out.print("Enter last name (or partial): ");
+                System.out.print(ColorUtils.juniorPrompt("Enter last name (or partial): "));
                 String lastName = scanner.nextLine().trim();
                 if (lastName.isEmpty()) {
-                    System.out.println("Last name cannot be empty.");
-                    System.out.println("Press Enter to continue...");
+                    System.out.println(ColorUtils.error("Last name cannot be empty."));
+                    System.out.println(ColorUtils.juniorPrompt("Press Enter to continue..."));
                     scanner.nextLine();
                     return;
                 }
@@ -144,11 +145,11 @@ public class JuniorMenu extends BaseMenu {
                 break;
 
             case 3:
-                System.out.print("Enter phone number (or partial): ");
+                System.out.print(ColorUtils.juniorPrompt("Enter phone number (or partial): "));
                 String phone = scanner.nextLine().trim();
                 if (phone.isEmpty()) {
-                    System.out.println("Phone number cannot be empty.");
-                    System.out.println("Press Enter to continue...");
+                    System.out.println(ColorUtils.error("Phone number cannot be empty."));
+                    System.out.println(ColorUtils.juniorPrompt("Press Enter to continue..."));
                     scanner.nextLine();
                     return;
                 }
@@ -156,11 +157,11 @@ public class JuniorMenu extends BaseMenu {
                 break;
 
             case 4:
-                System.out.print("Enter email (or partial): ");
+                System.out.print(ColorUtils.juniorPrompt("Enter email (or partial): "));
                 String email = scanner.nextLine().trim();
                 if (email.isEmpty()) {
-                    System.out.println("Email cannot be empty.");
-                    System.out.println("Press Enter to continue...");
+                    System.out.println(ColorUtils.error("Email cannot be empty."));
+                    System.out.println(ColorUtils.juniorPrompt("Press Enter to continue..."));
                     scanner.nextLine();
                     return;
                 }
@@ -174,62 +175,62 @@ public class JuniorMenu extends BaseMenu {
         }
 
         if (results.isEmpty()) {
-            System.out.println("\nNo contacts found matching your search criteria.");
+            System.out.println("\n" + ColorUtils.warning("No contacts found matching your search criteria."));
         } else {
-            System.out.println("\nSearch Results:");
+            System.out.println("\n" + ColorUtils.header("Search Results:"));
             displayContactsTable(results);
-            System.out.println("Found " + results.size() + " contact(s).");
+            System.out.println(ColorUtils.success("Found " + results.size() + " contact(s)."));
         }
-
-        System.out.println("\nPress Enter to continue...");
+        
+        System.out.println("\n" + ColorUtils.juniorPrompt("Press Enter to continue..."));
         scanner.nextLine();
     }
 
     private void searchByMultipleFields() {
-        System.out.println("\n--- Search by Multiple Fields ---");
-        System.out.println("=======================================");
-        System.out.println("Enter search criteria (press Enter to skip a field):\n");
-
+        System.out.println("\n" + ColorUtils.header("--- Search by Multiple Fields ---"));
+        System.out.println(ColorUtils.header("======================================="));
+        System.out.println(ColorUtils.info("Enter search criteria (press Enter to skip a field):\n"));
+        
         Map<String, String> criteria = new HashMap<>();
-
-        System.out.print("First Name: ");
+        
+        System.out.print(ColorUtils.juniorPrompt("First Name: "));
         String firstName = scanner.nextLine().trim();
         if (!firstName.isEmpty()) {
             criteria.put("first_name", firstName);
         }
 
-        System.out.print("Last Name: ");
+        System.out.print(ColorUtils.juniorPrompt("Last Name: "));
         String lastName = scanner.nextLine().trim();
         if (!lastName.isEmpty()) {
             criteria.put("last_name", lastName);
         }
-
-        System.out.print("Phone Number: ");
+        
+        System.out.print(ColorUtils.juniorPrompt("Phone Number: "));
         String phone = scanner.nextLine().trim();
         if (!phone.isEmpty()) {
             criteria.put("phone", phone);
         }
-
-        System.out.print("Email (partial): ");
+        
+        System.out.print(ColorUtils.juniorPrompt("Email (partial): "));
         String email = scanner.nextLine().trim();
         if (!email.isEmpty()) {
             criteria.put("email", email);
         }
-
-        System.out.print("Birth Month (1-12): ");
+        
+        System.out.print(ColorUtils.juniorPrompt("Birth Month (1-12): "));
         String birthMonth = scanner.nextLine().trim();
         if (!birthMonth.isEmpty()) {
             Integer month = BaseMenu.safeParseInt(birthMonth);
             if (month != null && month >= 1 && month <= 12) {
                 criteria.put("birth_month", month.toString());
             } else {
-                System.out.println("Invalid month. Skipping birth month filter.");
+                System.out.println(ColorUtils.warning("Invalid month. Skipping birth month filter."));
             }
         }
-
+        
         if (criteria.isEmpty()) {
-            System.out.println("\nNo search criteria provided. Please enter at least one field.");
-            System.out.println("Press Enter to continue...");
+            System.out.println("\n" + ColorUtils.error("No search criteria provided. Please enter at least one field."));
+            System.out.println(ColorUtils.juniorPrompt("Press Enter to continue..."));
             scanner.nextLine();
             return;
         }
@@ -237,34 +238,34 @@ public class JuniorMenu extends BaseMenu {
         List<Contact> results = contactDAO.searchByMultipleFields(criteria);
 
         if (results.isEmpty()) {
-            System.out.println("\nNo contacts found matching all your search criteria.");
+            System.out.println("\n" + ColorUtils.warning("No contacts found matching all your search criteria."));
         } else {
-            System.out.println("\nSearch Results:");
+            System.out.println("\n" + ColorUtils.header("Search Results:"));
             displayContactsTable(results);
-            System.out.println("Found " + results.size() + " contact(s) matching all criteria.");
+            System.out.println(ColorUtils.success("Found " + results.size() + " contact(s) matching all criteria."));
         }
-
-        System.out.println("\nPress Enter to continue...");
+        
+        System.out.println("\n" + ColorUtils.juniorPrompt("Press Enter to continue..."));
         scanner.nextLine();
     }
 
     private void sortContacts() {
-        System.out.println("\n--- Sort Contacts ---");
-        System.out.println("=======================================");
-        System.out.println("Select field to sort by:");
-        System.out.println("1. First Name");
-        System.out.println("2. Last Name");
-        System.out.println("3. Email");
-        System.out.println("4. Birth Date");
-        System.out.println("5. Phone Primary");
-        System.out.print("\nEnter your choice: ");
-
+        System.out.println("\n" + ColorUtils.header("--- Sort Contacts ---"));
+        System.out.println(ColorUtils.header("======================================="));
+        System.out.println(ColorUtils.info("Select field to sort by:"));
+        System.out.println(ColorUtils.juniorMenuOption("1. First Name"));
+        System.out.println(ColorUtils.juniorMenuOption("2. Last Name"));
+        System.out.println(ColorUtils.juniorMenuOption("3. Email"));
+        System.out.println(ColorUtils.juniorMenuOption("4. Birth Date"));
+        System.out.println(ColorUtils.juniorMenuOption("5. Phone Primary"));
+        System.out.print("\n" + ColorUtils.juniorPrompt("Enter your choice: "));
+        
         String choiceInput = scanner.nextLine().trim();
         Integer choice = BaseMenu.safeParseInt(choiceInput);
-
+        
         if (choice == null || choice < 1 || choice > 5) {
-            System.out.println("Invalid choice.");
-            System.out.println("Press Enter to continue...");
+            System.out.println(ColorUtils.error("Invalid choice."));
+            System.out.println(ColorUtils.juniorPrompt("Press Enter to continue..."));
             scanner.nextLine();
             return;
         }
@@ -279,67 +280,67 @@ public class JuniorMenu extends BaseMenu {
             default: field = "contact_id";
         }
 
-        System.out.println("\nSort order:");
+        System.out.println("\n" + ColorUtils.info("Sort order:"));
         if ("birth_date".equals(field)) {
-            System.out.println("1. Ascending (oldest to youngest)");
-            System.out.println("2. Descending (youngest to oldest)");
+            System.out.println(ColorUtils.juniorMenuOption("1. Ascending (oldest to youngest)"));
+            System.out.println(ColorUtils.juniorMenuOption("2. Descending (youngest to oldest)"));
         } else {
-            System.out.println("1. Ascending (A-Z, 1-9)");
-            System.out.println("2. Descending (Z-A, 9-1)");
+            System.out.println(ColorUtils.juniorMenuOption("1. Ascending (A-Z, 1-9)"));
+            System.out.println(ColorUtils.juniorMenuOption("2. Descending (Z-A, 9-1)"));
         }
-        System.out.print("Enter your choice: ");
-
+        System.out.print(ColorUtils.juniorPrompt("Enter your choice: "));
+        
         String orderInput = scanner.nextLine().trim();
         Integer orderChoice = BaseMenu.safeParseInt(orderInput);
-
+        
         boolean ascending = orderChoice == null || orderChoice != 2;
-
+        
         List<Contact> contacts = contactDAO.findAllSorted(field, ascending);
-
+        
         if (contacts.isEmpty()) {
-            System.out.println("No contacts found.");
+            System.out.println(ColorUtils.warning("No contacts found."));
         } else {
-            System.out.println("\nSorted Contacts:");
+            System.out.println("\n" + ColorUtils.header("Sorted Contacts:"));
             displayContactsTable(contacts);
-            System.out.println("Total contacts: " + contacts.size());
+            System.out.println(ColorUtils.info("Total contacts: " + contacts.size()));
         }
-
-        System.out.println("\nPress Enter to continue...");
+        
+        System.out.println("\n" + ColorUtils.juniorPrompt("Press Enter to continue..."));
         scanner.nextLine();
     }
 
     private void updateContact() {
-        System.out.println("\n--- Update Contact ---");
-        System.out.println("=======================================");
+        System.out.println("\n" + ColorUtils.header("--- Update Contact ---"));
+        System.out.println(ColorUtils.header("======================================="));
 
-        System.out.print("Enter Contact ID to update: ");
+        System.out.print(ColorUtils.juniorPrompt("Enter Contact ID to update: "));
         String idInput = scanner.nextLine().trim();
         Integer contactId = BaseMenu.safeParseInt(idInput);
 
         if (contactId == null) {
-            System.out.println("Invalid contact ID. Please enter a valid number.");
-            System.out.println("Press Enter to continue...");
+            System.out.println(ColorUtils.error("Invalid contact ID. Please enter a valid number."));
+            System.out.println(ColorUtils.juniorPrompt("Press Enter to continue..."));
             scanner.nextLine();
             return;
         }
 
         Contact contact = contactDAO.findById(contactId);
         if (contact == null) {
-            System.out.println("Contact with ID " + contactId + " not found.");
-            System.out.println("Press Enter to continue...");
+            System.out.println(ColorUtils.error("Contact with ID " + contactId + " not found."));
+            System.out.println(ColorUtils.juniorPrompt("Press Enter to continue..."));
             scanner.nextLine();
             return;
         }
 
         DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
-        System.out.println("\nCurrent Contact Information:");
+        System.out.println("\n" + ColorUtils.header("Current Contact Information:"));
         displayContactsTable(List.of(contact));
-        System.out.println("\nEnter new values (press Enter to keep current value):");
+        System.out.println("\n" + ColorUtils.info("Enter new values (press Enter to keep current value):"));
 
         // First name - letters only
         while (true) {
-            System.out.print("First Name [" + nullToEmpty(contact.getFirstName()) + "] (letters only): ");
+            System.out.print(ColorUtils.juniorPrompt("First Name [" + nullToEmpty(contact.getFirstName()) + "] (letters only): "));
             String firstName = scanner.nextLine().trim();
 
             if (firstName.isEmpty()) {
@@ -347,7 +348,7 @@ public class JuniorMenu extends BaseMenu {
             }
 
             if (!ValidationUtils.isValidName(firstName)) {
-                System.out.println("Invalid first name. Use letters only (you may use spaces, '-' or ').");
+                System.out.println(ColorUtils.error("Invalid first name. Use letters only (you may use spaces, '-' or ')."));
                 continue;
             }
 
@@ -357,7 +358,7 @@ public class JuniorMenu extends BaseMenu {
 
         // Middle name - optional, letters only if provided
         while (true) {
-            System.out.print("Middle Name [" + nullToEmpty(contact.getMiddleName()) + "] (optional, letters only or Enter to keep): ");
+            System.out.print(ColorUtils.juniorPrompt("Middle Name [" + nullToEmpty(contact.getMiddleName()) + "] (optional, letters only or Enter to keep): "));
             String middleName = scanner.nextLine().trim();
 
             if (middleName.isEmpty()) {
@@ -365,7 +366,7 @@ public class JuniorMenu extends BaseMenu {
             }
 
             if (!ValidationUtils.isValidName(middleName)) {
-                System.out.println("Invalid middle name. Use letters only (you may use spaces, '-' or '), or press Enter to keep current value.");
+                System.out.println(ColorUtils.error("Invalid middle name. Use letters only (you may use spaces, '-' or '), or press Enter to keep current value."));
                 continue;
             }
 
@@ -375,7 +376,7 @@ public class JuniorMenu extends BaseMenu {
 
         // Last name - letters only
         while (true) {
-            System.out.print("Last Name [" + nullToEmpty(contact.getLastName()) + "] (letters only): ");
+            System.out.print(ColorUtils.juniorPrompt("Last Name [" + nullToEmpty(contact.getLastName()) + "] (letters only): "));
             String lastName = scanner.nextLine().trim();
 
             if (lastName.isEmpty()) {
@@ -383,7 +384,7 @@ public class JuniorMenu extends BaseMenu {
             }
 
             if (!ValidationUtils.isValidName(lastName)) {
-                System.out.println("Invalid last name. Use letters only (you may use spaces, '-' or ').");
+                System.out.println(ColorUtils.error("Invalid last name. Use letters only (you may use spaces, '-' or ')."));
                 continue;
             }
 
@@ -393,7 +394,7 @@ public class JuniorMenu extends BaseMenu {
 
         // Nickname - optional, letters/digits/basic chars
         while (true) {
-            System.out.print("Nickname [" + nullToEmpty(contact.getNickname()) + "] (optional, letters/digits/-/_ or Enter to keep): ");
+            System.out.print(ColorUtils.juniorPrompt("Nickname [" + nullToEmpty(contact.getNickname()) + "] (optional, letters/digits/-/_ or Enter to keep): "));
             String nickname = scanner.nextLine().trim();
 
             if (nickname.isEmpty()) {
@@ -401,7 +402,7 @@ public class JuniorMenu extends BaseMenu {
             }
 
             if (!ValidationUtils.isValidNickname(nickname)) {
-                System.out.println("Invalid nickname. Allowed characters: letters, digits, spaces, '-' and '_', or press Enter to keep current value.");
+                System.out.println(ColorUtils.error("Invalid nickname. Allowed characters: letters, digits, spaces, '-' and '_', or press Enter to keep current value."));
                 continue;
             }
 
@@ -411,7 +412,7 @@ public class JuniorMenu extends BaseMenu {
 
         // Phone 1 - digits only, at least 10 digits
         while (true) {
-            System.out.print("Phone 1 [" + nullToEmpty(contact.getPhonePrimary()) + "] (digits only, min 10): ");
+            System.out.print(ColorUtils.juniorPrompt("Phone 1 [" + nullToEmpty(contact.getPhonePrimary()) + "] (digits only, min 10): "));
             String phone1 = scanner.nextLine().trim();
 
             if (phone1.isEmpty()) {
@@ -419,7 +420,7 @@ public class JuniorMenu extends BaseMenu {
             }
 
             if (!ValidationUtils.isValidPhone(phone1)) {
-                System.out.println("Invalid phone number. Use digits only and at least 10 digits.");
+                System.out.println(ColorUtils.error("Invalid phone number. Use digits only and at least 10 digits."));
                 continue;
             }
 
@@ -429,7 +430,7 @@ public class JuniorMenu extends BaseMenu {
 
         // Phone 2 - optional
         while (true) {
-            System.out.print("Phone 2 [" + nullToEmpty(contact.getPhoneSecondary()) + "] (optional, digits only, min 10 or Enter to keep): ");
+            System.out.print(ColorUtils.juniorPrompt("Phone 2 [" + nullToEmpty(contact.getPhoneSecondary()) + "] (optional, digits only, min 10 or Enter to keep): "));
             String phone2 = scanner.nextLine().trim();
 
             if (phone2.isEmpty()) {
@@ -437,7 +438,7 @@ public class JuniorMenu extends BaseMenu {
             }
 
             if (!ValidationUtils.isValidPhone(phone2)) {
-                System.out.println("Invalid phone number. Use digits only and at least 10 digits, or press Enter to keep the current value.");
+                System.out.println(ColorUtils.error("Invalid phone number. Use digits only and at least 10 digits, or press Enter to keep the current value."));
                 continue;
             }
 
@@ -447,7 +448,7 @@ public class JuniorMenu extends BaseMenu {
 
         // Email - must have basic structure
         while (true) {
-            System.out.print("Email [" + nullToEmpty(contact.getEmail()) + "]: ");
+            System.out.print(ColorUtils.juniorPrompt("Email [" + nullToEmpty(contact.getEmail()) + "]: "));
             String email = scanner.nextLine().trim();
 
             if (email.isEmpty()) {
@@ -455,7 +456,7 @@ public class JuniorMenu extends BaseMenu {
             }
 
             if (!ValidationUtils.isValidEmail(email)) {
-                System.out.println("Invalid email. It must contain '@', a domain with '.', and no spaces (e.g., user@example.com).");
+                System.out.println(ColorUtils.error("Invalid email. It must contain '@', a domain with '.', and no spaces (e.g., user@example.com)."));
                 continue;
             }
 
@@ -463,7 +464,7 @@ public class JuniorMenu extends BaseMenu {
             break;
         }
 
-        System.out.print("LinkedIn URL [" + nullToEmpty(contact.getLinkedinUrl()) + "]: ");
+        System.out.print(ColorUtils.juniorPrompt("LinkedIn URL [" + nullToEmpty(contact.getLinkedinUrl()) + "]: "));
         String linkedin = scanner.nextLine().trim();
         if (!linkedin.isEmpty()) {
             contact.setLinkedinUrl(linkedin);
@@ -474,7 +475,7 @@ public class JuniorMenu extends BaseMenu {
                 : "N/A";
 
         while (true) {
-            System.out.print("Birth Date (" + currentBirthDate + ") [yyyy-MM-dd or Enter to keep]: ");
+            System.out.print(ColorUtils.juniorPrompt("Birth Date (" + currentBirthDate + ") [yyyy-MM-dd or Enter to keep]: "));
             String birthDateInput = scanner.nextLine().trim();
 
             if (birthDateInput.isEmpty()) {
@@ -484,7 +485,7 @@ public class JuniorMenu extends BaseMenu {
 
             // Enforce strict yyyy-MM-dd pattern (e.g., 2002-05-05)
             if (!birthDateInput.matches("\\d{4}-\\d{2}-\\d{2}")) {
-                System.out.println("Invalid format. Please enter the date exactly as yyyy-MM-dd (e.g., 2002-05-05).");
+                System.out.println(ColorUtils.error("Invalid format. Please enter the date exactly as yyyy-MM-dd (e.g., 2002-05-05)."));
                 continue;
             }
 
@@ -493,31 +494,31 @@ public class JuniorMenu extends BaseMenu {
                 contact.setBirthDate(birthDate);
                 break;
             } catch (DateTimeParseException e) {
-                System.out.println("Invalid date value. Please enter a real calendar date in yyyy-MM-dd format.");
+                System.out.println(ColorUtils.error("Invalid date value. Please enter a real calendar date in yyyy-MM-dd format."));
             }
         }
 
         if (contactDAO.update(contact)) {
-            System.out.println("\nContact updated successfully!");
+            System.out.println("\n" + ColorUtils.success("Contact updated successfully!"));
         } else {
-            System.out.println("\nFailed to update contact.");
+            System.out.println("\n" + ColorUtils.error("Failed to update contact."));
         }
 
-        System.out.println("Press Enter to continue...");
+        System.out.println(ColorUtils.juniorPrompt("Press Enter to continue..."));
         scanner.nextLine();
     }
 
     private void changePassword() {
-        System.out.println("\n--- Change Password ---");
-        System.out.println("=======================================");
+        System.out.println("\n" + ColorUtils.header("--- Change Password ---"));
+        System.out.println(ColorUtils.header("======================================="));
 
-        System.out.print("Enter current password: ");
+        System.out.print(ColorUtils.juniorPrompt("Enter current password: "));
         String currentPassword = scanner.nextLine().trim();
 
         User currentUserFromDB = userDAO.findById(currentUser.getUserId());
         if (currentUserFromDB == null) {
-            System.out.println("Error: Could not retrieve user information.");
-            System.out.println("Press Enter to continue...");
+            System.out.println(ColorUtils.error("Error: Could not retrieve user information."));
+            System.out.println(ColorUtils.juniorPrompt("Press Enter to continue..."));
             scanner.nextLine();
             return;
         }
@@ -534,27 +535,27 @@ public class JuniorMenu extends BaseMenu {
         }
 
         if (!passwordMatches) {
-            System.out.println("Current password is incorrect.");
-            System.out.println("Press Enter to continue...");
+            System.out.println(ColorUtils.error("Current password is incorrect."));
+            System.out.println(ColorUtils.juniorPrompt("Press Enter to continue..."));
             scanner.nextLine();
             return;
         }
 
-        System.out.print("Enter new password: ");
+        System.out.print(ColorUtils.juniorPrompt("Enter new password: "));
         String newPassword = scanner.nextLine().trim();
         if (newPassword.isEmpty()) {
-            System.out.println("Password cannot be empty.");
-            System.out.println("Press Enter to continue...");
+            System.out.println(ColorUtils.error("Password cannot be empty."));
+            System.out.println(ColorUtils.juniorPrompt("Press Enter to continue..."));
             scanner.nextLine();
             return;
         }
 
-        System.out.print("Confirm new password: ");
+        System.out.print(ColorUtils.juniorPrompt("Confirm new password: "));
         String confirmPassword = scanner.nextLine().trim();
 
         if (!newPassword.equals(confirmPassword)) {
-            System.out.println("Passwords do not match. Password not changed.");
-            System.out.println("Press Enter to continue...");
+            System.out.println(ColorUtils.error("Passwords do not match. Password not changed."));
+            System.out.println(ColorUtils.juniorPrompt("Press Enter to continue..."));
             scanner.nextLine();
             return;
         }
@@ -563,16 +564,16 @@ public class JuniorMenu extends BaseMenu {
         userDAO.updatePasswordHash(currentUser.getUserId(), hashedPassword);
         currentUser.setPasswordHash(hashedPassword);
 
-        System.out.println("Password changed successfully!");
-        System.out.println("Press Enter to continue...");
+        System.out.println(ColorUtils.success("Password changed successfully!"));
+        System.out.println(ColorUtils.juniorPrompt("Press Enter to continue..."));
         scanner.nextLine();
     }
 
     private void displayContactsTable(List<Contact> contacts) {
-        System.out.printf("%-6s %-15s %-15s %-15s %-15s %-15s %-15s %-25s %-25s %-12s%n",
+        System.out.printf(ColorUtils.header("%-6s %-15s %-15s %-15s %-15s %-15s %-15s %-25s %-25s %-12s%n"),
             "ID", "First Name", "Middle Name", "Last Name", "Nickname",
             "Phone 1", "Phone 2", "Email", "LinkedIn", "Birth Date");
-        System.out.println("--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
+        System.out.println(ColorUtils.colorize("--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------", ColorUtils.CYAN));
 
         DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 

@@ -1,5 +1,6 @@
 package menu;
 
+import dao.ContactDAO;
 import dao.UserDAO;
 import model.User;
 import service.AuthService;
@@ -22,6 +23,7 @@ import java.util.List;
 public class ManagerMenu extends BaseMenu {
 
     private final UserDAO userDAO;
+    private final ContactDAO contactDAO;
 
     /**
      * Constructor for ManagerMenu.
@@ -31,6 +33,7 @@ public class ManagerMenu extends BaseMenu {
     public ManagerMenu(User user) {
         super(user);
         this.userDAO = new UserDAO();
+        this.contactDAO = new ContactDAO();
     }
 
     @Override
@@ -72,11 +75,65 @@ public class ManagerMenu extends BaseMenu {
 
     /**
      * Displays contacts statistical information.
-     * Currently not implemented - requires ContactDAO statistics methods.
+     * Shows various statistics about contacts including counts, names, ages, and LinkedIn presence.
      */
     private void showStatistics() {
         System.out.println("\n--- Contacts Statistical Info ---");
-        System.out.println("(Not yet implemented - requires ContactDAO statistics)");
+        System.out.println("=======================================");
+        
+        java.util.Map<String, Object> stats = contactDAO.getStatistics();
+        
+        if (stats.isEmpty()) {
+            System.out.println("Unable to retrieve statistics. Please check database connection.");
+            System.out.println("Press Enter to continue...");
+            scanner.nextLine();
+            return;
+        }
+        
+        // Total contacts
+        if (stats.containsKey("total_contacts")) {
+            System.out.println("\nTotal Contacts: " + stats.get("total_contacts"));
+        }
+        
+        // LinkedIn statistics
+        if (stats.containsKey("contacts_with_linkedin") && stats.containsKey("contacts_without_linkedin")) {
+            System.out.println("\nLinkedIn Statistics:");
+            System.out.println("  - Contacts with LinkedIn: " + stats.get("contacts_with_linkedin"));
+            System.out.println("  - Contacts without LinkedIn: " + stats.get("contacts_without_linkedin"));
+        }
+        
+        // Most common first name
+        if (stats.containsKey("most_common_first_name") && stats.containsKey("most_common_first_name_count")) {
+            System.out.println("\nMost Common First Name:");
+            System.out.println("  - Name: " + stats.get("most_common_first_name"));
+            System.out.println("  - Count: " + stats.get("most_common_first_name_count") + " contact(s)");
+        }
+        
+        // Most common last name
+        if (stats.containsKey("most_common_last_name") && stats.containsKey("most_common_last_name_count")) {
+            System.out.println("\nMost Common Last Name:");
+            System.out.println("  - Name: " + stats.get("most_common_last_name"));
+            System.out.println("  - Count: " + stats.get("most_common_last_name_count") + " contact(s)");
+        }
+        
+        // Age statistics
+        if (stats.containsKey("youngest_contact") && stats.containsKey("youngest_birth_date")) {
+            System.out.println("\nYoungest Contact:");
+            System.out.println("  - Name: " + stats.get("youngest_contact"));
+            System.out.println("  - Birth Date: " + stats.get("youngest_birth_date"));
+        }
+        
+        if (stats.containsKey("oldest_contact") && stats.containsKey("oldest_birth_date")) {
+            System.out.println("\nOldest Contact:");
+            System.out.println("  - Name: " + stats.get("oldest_contact"));
+            System.out.println("  - Birth Date: " + stats.get("oldest_birth_date"));
+        }
+        
+        if (stats.containsKey("average_age")) {
+            System.out.println("\nAverage Age: " + stats.get("average_age") + " years");
+        }
+        
+        System.out.println("\n=======================================");
         System.out.println("Press Enter to continue...");
         scanner.nextLine();
     }

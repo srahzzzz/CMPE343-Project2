@@ -5,7 +5,6 @@ import dao.UserDAO;
 import model.Contact;
 import model.User;
 import service.AuthService;
-import service.ANSI;
 import service.ValidationUtils;
 
 import java.time.LocalDate;
@@ -33,6 +32,11 @@ public class JuniorMenu extends BaseMenu {
     private final ContactDAO contactDAO;
     private final UserDAO userDAO;
 
+    /**
+     * Constructor for JuniorMenu.
+     *
+     * @param user the logged-in junior developer user
+     */
     public JuniorMenu(User user) {
         super(user);
         this.contactDAO = new ContactDAO();
@@ -41,39 +45,52 @@ public class JuniorMenu extends BaseMenu {
 
     @Override
     protected void displayMenu() {
-        System.out.println(ANSI.CYAN + "1. List all contacts" + ANSI.RESET);
-        System.out.println(ANSI.CYAN + "2. Search by field" + ANSI.RESET);
-        System.out.println(ANSI.CYAN + "3. Search by multiple fields" + ANSI.RESET);
-        System.out.println(ANSI.CYAN + "4. Sort contacts" + ANSI.RESET);
-        System.out.println(ANSI.CYAN + "5. Update contact" + ANSI.RESET);
-        System.out.println(ANSI.CYAN + "6. Change password" + ANSI.RESET);
-        System.out.println(ANSI.YELLOW + "0. Logout" + ANSI.RESET);
+        System.out.println("1. List all contacts");
+        System.out.println("2. Search by field");
+        System.out.println("3. Search by multiple fields");
+        System.out.println("4. Sort contacts");
+        System.out.println("5. Update contact");
+        System.out.println("6. Change password");
+        System.out.println("0. Logout");
     }
 
     @Override
     protected void handleOption(int choice) {
         switch (choice) {
-            case 1 -> listAllContacts();
-            case 2 -> searchByField();
-            case 3 -> searchByMultipleFields();
-            case 4 -> sortContacts();
-            case 5 -> updateContact();
-            case 6 -> changePassword();
-            default -> System.out.println(ANSI.RED + "\nInvalid option! Please try again." + ANSI.RESET);
+            case 1:
+                listAllContacts();
+                break;
+            case 2:
+                searchByField();
+                break;
+            case 3:
+                searchByMultipleFields();
+                break;
+            case 4:
+                sortContacts();
+                break;
+            case 5:
+                updateContact();
+                break;
+            case 6:
+                changePassword();
+                break;
+            default:
+                System.out.println("\nInvalid option! Please try again.");
         }
     }
 
     private void listAllContacts() {
-        System.out.println(ANSI.BLUE + "\n--- List All Contacts ---" + ANSI.RESET);
+        System.out.println("\n--- List All Contacts ---");
         System.out.println("=======================================");
 
         List<Contact> contacts = contactDAO.findAll();
 
         if (contacts.isEmpty()) {
-            System.out.println(ANSI.YELLOW + "No contacts found in the database." + ANSI.RESET);
+            System.out.println("No contacts found in the database.");
         } else {
             displayContactsTable(contacts);
-            System.out.println(ANSI.GREEN + "Total contacts: " + contacts.size() + ANSI.RESET);
+            System.out.println("Total contacts: " + contacts.size());
         }
 
         System.out.println("\nPress Enter to continue...");
@@ -81,19 +98,19 @@ public class JuniorMenu extends BaseMenu {
     }
 
     private void searchByField() {
-        System.out.println(ANSI.BLUE + "\n--- Search by Field ---" + ANSI.RESET);
+        System.out.println("\n--- Search by Field ---");
         System.out.println("=======================================");
         System.out.println("1. Search by First Name");
         System.out.println("2. Search by Last Name");
         System.out.println("3. Search by Phone Number");
         System.out.println("4. Search by Email");
-        System.out.print(ANSI.CYAN + "\nSelect search type: " + ANSI.RESET);
+        System.out.print("\nSelect search type: ");
 
         String choiceInput = scanner.nextLine().trim();
         Integer choice = BaseMenu.safeParseInt(choiceInput);
 
         if (choice == null || choice < 1 || choice > 4) {
-            System.out.println(ANSI.RED + "Invalid choice. Please select 1, 2, 3, or 4." + ANSI.RESET);
+            System.out.println("Invalid choice. Please select 1, 2, 3, or 4.");
             System.out.println("Press Enter to continue...");
             scanner.nextLine();
             return;
@@ -102,44 +119,47 @@ public class JuniorMenu extends BaseMenu {
         List<Contact> results;
 
         switch (choice) {
-            case 1 -> {
-                System.out.print(ANSI.CYAN + "Enter first name (or partial): " + ANSI.RESET);
+            case 1:
+                System.out.print("Enter first name (or partial): ");
                 String firstName = scanner.nextLine().trim();
                 if (firstName.isEmpty()) {
-                    System.out.println(ANSI.RED + "First name cannot be empty." + ANSI.RESET);
+                    System.out.println("First name cannot be empty.");
                     System.out.println("Press Enter to continue...");
                     scanner.nextLine();
                     return;
                 }
                 results = contactDAO.searchByFirstName(firstName);
-            }
-            case 2 -> {
-                System.out.print(ANSI.CYAN + "Enter last name (or partial): " + ANSI.RESET);
+                break;
+
+            case 2:
+                System.out.print("Enter last name (or partial): ");
                 String lastName = scanner.nextLine().trim();
                 if (lastName.isEmpty()) {
-                    System.out.println(ANSI.RED + "Last name cannot be empty." + ANSI.RESET);
+                    System.out.println("Last name cannot be empty.");
                     System.out.println("Press Enter to continue...");
                     scanner.nextLine();
                     return;
                 }
                 results = contactDAO.searchByLastName(lastName);
-            }
-            case 3 -> {
-                System.out.print(ANSI.CYAN + "Enter phone number (or partial): " + ANSI.RESET);
+                break;
+
+            case 3:
+                System.out.print("Enter phone number (or partial): ");
                 String phone = scanner.nextLine().trim();
                 if (phone.isEmpty()) {
-                    System.out.println(ANSI.RED + "Phone number cannot be empty." + ANSI.RESET);
+                    System.out.println("Phone number cannot be empty.");
                     System.out.println("Press Enter to continue...");
                     scanner.nextLine();
                     return;
                 }
                 results = contactDAO.searchByPhone(phone);
-            }
-            case 4 -> {
-                System.out.print(ANSI.CYAN + "Enter email (or partial): " + ANSI.RESET);
+                break;
+
+            case 4:
+                System.out.print("Enter email (or partial): ");
                 String email = scanner.nextLine().trim();
                 if (email.isEmpty()) {
-                    System.out.println(ANSI.RED + "Email cannot be empty." + ANSI.RESET);
+                    System.out.println("Email cannot be empty.");
                     System.out.println("Press Enter to continue...");
                     scanner.nextLine();
                     return;
@@ -147,16 +167,18 @@ public class JuniorMenu extends BaseMenu {
                 Map<String, String> emailCriteria = new HashMap<>();
                 emailCriteria.put("email", email);
                 results = contactDAO.searchByMultipleFields(emailCriteria);
-            }
-            default -> results = List.of();
+                break;
+
+            default:
+                results = List.of();
         }
 
         if (results.isEmpty()) {
-            System.out.println(ANSI.YELLOW + "\nNo contacts found matching your search criteria." + ANSI.RESET);
+            System.out.println("\nNo contacts found matching your search criteria.");
         } else {
-            System.out.println(ANSI.BLUE + "\nSearch Results:" + ANSI.RESET);
+            System.out.println("\nSearch Results:");
             displayContactsTable(results);
-            System.out.println(ANSI.GREEN + "Found " + results.size() + " contact(s)." + ANSI.RESET);
+            System.out.println("Found " + results.size() + " contact(s).");
         }
 
         System.out.println("\nPress Enter to continue...");
@@ -164,41 +186,49 @@ public class JuniorMenu extends BaseMenu {
     }
 
     private void searchByMultipleFields() {
-        System.out.println(ANSI.BLUE + "\n--- Search by Multiple Fields ---" + ANSI.RESET);
+        System.out.println("\n--- Search by Multiple Fields ---");
         System.out.println("=======================================");
         System.out.println("Enter search criteria (press Enter to skip a field):\n");
 
         Map<String, String> criteria = new HashMap<>();
 
-        System.out.print(ANSI.CYAN + "First Name: " + ANSI.RESET);
+        System.out.print("First Name: ");
         String firstName = scanner.nextLine().trim();
-        if (!firstName.isEmpty()) criteria.put("first_name", firstName);
+        if (!firstName.isEmpty()) {
+            criteria.put("first_name", firstName);
+        }
 
-        System.out.print(ANSI.CYAN + "Last Name: " + ANSI.RESET);
+        System.out.print("Last Name: ");
         String lastName = scanner.nextLine().trim();
-        if (!lastName.isEmpty()) criteria.put("last_name", lastName);
+        if (!lastName.isEmpty()) {
+            criteria.put("last_name", lastName);
+        }
 
-        System.out.print(ANSI.CYAN + "Phone Number: " + ANSI.RESET);
+        System.out.print("Phone Number: ");
         String phone = scanner.nextLine().trim();
-        if (!phone.isEmpty()) criteria.put("phone", phone);
+        if (!phone.isEmpty()) {
+            criteria.put("phone", phone);
+        }
 
-        System.out.print(ANSI.CYAN + "Email (partial): " + ANSI.RESET);
+        System.out.print("Email (partial): ");
         String email = scanner.nextLine().trim();
-        if (!email.isEmpty()) criteria.put("email", email);
+        if (!email.isEmpty()) {
+            criteria.put("email", email);
+        }
 
-        System.out.print(ANSI.CYAN + "Birth Month (1-12): " + ANSI.RESET);
+        System.out.print("Birth Month (1-12): ");
         String birthMonth = scanner.nextLine().trim();
         if (!birthMonth.isEmpty()) {
             Integer month = BaseMenu.safeParseInt(birthMonth);
             if (month != null && month >= 1 && month <= 12) {
                 criteria.put("birth_month", month.toString());
             } else {
-                System.out.println(ANSI.YELLOW + "Invalid month. Skipping birth month filter." + ANSI.RESET);
+                System.out.println("Invalid month. Skipping birth month filter.");
             }
         }
 
         if (criteria.isEmpty()) {
-            System.out.println(ANSI.RED + "\nNo search criteria provided. Please enter at least one field." + ANSI.RESET);
+            System.out.println("\nNo search criteria provided. Please enter at least one field.");
             System.out.println("Press Enter to continue...");
             scanner.nextLine();
             return;
@@ -207,11 +237,11 @@ public class JuniorMenu extends BaseMenu {
         List<Contact> results = contactDAO.searchByMultipleFields(criteria);
 
         if (results.isEmpty()) {
-            System.out.println(ANSI.YELLOW + "\nNo contacts found matching all your search criteria." + ANSI.RESET);
+            System.out.println("\nNo contacts found matching all your search criteria.");
         } else {
-            System.out.println(ANSI.BLUE + "\nSearch Results:" + ANSI.RESET);
+            System.out.println("\nSearch Results:");
             displayContactsTable(results);
-            System.out.println(ANSI.GREEN + "Found " + results.size() + " contact(s) matching all criteria." + ANSI.RESET);
+            System.out.println("Found " + results.size() + " contact(s) matching all criteria.");
         }
 
         System.out.println("\nPress Enter to continue...");
@@ -219,7 +249,7 @@ public class JuniorMenu extends BaseMenu {
     }
 
     private void sortContacts() {
-        System.out.println(ANSI.BLUE + "\n--- Sort Contacts ---" + ANSI.RESET);
+        System.out.println("\n--- Sort Contacts ---");
         System.out.println("=======================================");
         System.out.println("Select field to sort by:");
         System.out.println("1. First Name");
@@ -227,26 +257,27 @@ public class JuniorMenu extends BaseMenu {
         System.out.println("3. Email");
         System.out.println("4. Birth Date");
         System.out.println("5. Phone Primary");
-        System.out.print(ANSI.CYAN + "\nEnter your choice: " + ANSI.RESET);
+        System.out.print("\nEnter your choice: ");
 
         String choiceInput = scanner.nextLine().trim();
         Integer choice = BaseMenu.safeParseInt(choiceInput);
 
         if (choice == null || choice < 1 || choice > 5) {
-            System.out.println(ANSI.RED + "Invalid choice." + ANSI.RESET);
+            System.out.println("Invalid choice.");
             System.out.println("Press Enter to continue...");
             scanner.nextLine();
             return;
         }
 
-        String field = switch (choice) {
-            case 1 -> "first_name";
-            case 2 -> "last_name";
-            case 3 -> "email";
-            case 4 -> "birth_date";
-            case 5 -> "phone_primary";
-            default -> "contact_id";
-        };
+        String field;
+        switch (choice) {
+            case 1: field = "first_name"; break;
+            case 2: field = "last_name"; break;
+            case 3: field = "email"; break;
+            case 4: field = "birth_date"; break;
+            case 5: field = "phone_primary"; break;
+            default: field = "contact_id";
+        }
 
         System.out.println("\nSort order:");
         if ("birth_date".equals(field)) {
@@ -256,7 +287,7 @@ public class JuniorMenu extends BaseMenu {
             System.out.println("1. Ascending (A-Z, 1-9)");
             System.out.println("2. Descending (Z-A, 9-1)");
         }
-        System.out.print(ANSI.CYAN + "Enter your choice: " + ANSI.RESET);
+        System.out.print("Enter your choice: ");
 
         String orderInput = scanner.nextLine().trim();
         Integer orderChoice = BaseMenu.safeParseInt(orderInput);
@@ -266,11 +297,11 @@ public class JuniorMenu extends BaseMenu {
         List<Contact> contacts = contactDAO.findAllSorted(field, ascending);
 
         if (contacts.isEmpty()) {
-            System.out.println(ANSI.YELLOW + "No contacts found." + ANSI.RESET);
+            System.out.println("No contacts found.");
         } else {
-            System.out.println(ANSI.BLUE + "\nSorted Contacts:" + ANSI.RESET);
+            System.out.println("\nSorted Contacts:");
             displayContactsTable(contacts);
-            System.out.println(ANSI.GREEN + "Total contacts: " + contacts.size() + ANSI.RESET);
+            System.out.println("Total contacts: " + contacts.size());
         }
 
         System.out.println("\nPress Enter to continue...");
@@ -278,15 +309,15 @@ public class JuniorMenu extends BaseMenu {
     }
 
     private void updateContact() {
-        System.out.println(ANSI.BLUE + "\n--- Update Contact ---" + ANSI.RESET);
+        System.out.println("\n--- Update Contact ---");
         System.out.println("=======================================");
 
-        System.out.print(ANSI.CYAN + "Enter Contact ID to update: " + ANSI.RESET);
+        System.out.print("Enter Contact ID to update: ");
         String idInput = scanner.nextLine().trim();
         Integer contactId = BaseMenu.safeParseInt(idInput);
 
         if (contactId == null) {
-            System.out.println(ANSI.RED + "Invalid contact ID. Please enter a valid number." + ANSI.RESET);
+            System.out.println("Invalid contact ID. Please enter a valid number.");
             System.out.println("Press Enter to continue...");
             scanner.nextLine();
             return;
@@ -294,7 +325,7 @@ public class JuniorMenu extends BaseMenu {
 
         Contact contact = contactDAO.findById(contactId);
         if (contact == null) {
-            System.out.println(ANSI.RED + "Contact with ID " + contactId + " not found." + ANSI.RESET);
+            System.out.println("Contact with ID " + contactId + " not found.");
             System.out.println("Press Enter to continue...");
             scanner.nextLine();
             return;
@@ -306,125 +337,170 @@ public class JuniorMenu extends BaseMenu {
         displayContactsTable(List.of(contact));
         System.out.println("\nEnter new values (press Enter to keep current value):");
 
-        // First name
+        // First name - letters only
         while (true) {
-            System.out.print(ANSI.CYAN + "First Name [" + nullToEmpty(contact.getFirstName()) + "] (letters only): " + ANSI.RESET);
+            System.out.print("First Name [" + nullToEmpty(contact.getFirstName()) + "] (letters only): ");
             String firstName = scanner.nextLine().trim();
 
-            if (firstName.isEmpty()) break;
+            if (firstName.isEmpty()) {
+                break; // keep existing
+            }
+
             if (!ValidationUtils.isValidName(firstName)) {
-                System.out.println(ANSI.RED + "Invalid first name. Use letters only." + ANSI.RESET);
+                System.out.println("Invalid first name. Use letters only (you may use spaces, '-' or ').");
                 continue;
             }
+
             contact.setFirstName(firstName);
             break;
         }
 
-        // Middle name
+        // Middle name - optional, letters only if provided
         while (true) {
-            System.out.print(ANSI.CYAN + "Middle Name [" + nullToEmpty(contact.getMiddleName()) + "] (optional, letters only or Enter to keep): " + ANSI.RESET);
+            System.out.print("Middle Name [" + nullToEmpty(contact.getMiddleName()) + "] (optional, letters only or Enter to keep): ");
             String middleName = scanner.nextLine().trim();
-            if (middleName.isEmpty()) break;
+
+            if (middleName.isEmpty()) {
+                break; // keep existing
+            }
+
             if (!ValidationUtils.isValidName(middleName)) {
-                System.out.println(ANSI.RED + "Invalid middle name." + ANSI.RESET);
+                System.out.println("Invalid middle name. Use letters only (you may use spaces, '-' or '), or press Enter to keep current value.");
                 continue;
             }
+
             contact.setMiddleName(middleName);
             break;
         }
 
-        // Last name
+        // Last name - letters only
         while (true) {
-            System.out.print(ANSI.CYAN + "Last Name [" + nullToEmpty(contact.getLastName()) + "] (letters only): " + ANSI.RESET);
+            System.out.print("Last Name [" + nullToEmpty(contact.getLastName()) + "] (letters only): ");
             String lastName = scanner.nextLine().trim();
-            if (lastName.isEmpty()) break;
+
+            if (lastName.isEmpty()) {
+                break; // keep existing
+            }
+
             if (!ValidationUtils.isValidName(lastName)) {
-                System.out.println(ANSI.RED + "Invalid last name." + ANSI.RESET);
+                System.out.println("Invalid last name. Use letters only (you may use spaces, '-' or ').");
                 continue;
             }
+
             contact.setLastName(lastName);
             break;
         }
 
-        // Nickname
+        // Nickname - optional, letters/digits/basic chars
         while (true) {
-            System.out.print(ANSI.CYAN + "Nickname [" + nullToEmpty(contact.getNickname()) + "] (optional, letters/digits/-/_ or Enter to keep): " + ANSI.RESET);
+            System.out.print("Nickname [" + nullToEmpty(contact.getNickname()) + "] (optional, letters/digits/-/_ or Enter to keep): ");
             String nickname = scanner.nextLine().trim();
-            if (nickname.isEmpty()) break;
+
+            if (nickname.isEmpty()) {
+                break; // keep existing
+            }
+
             if (!ValidationUtils.isValidNickname(nickname)) {
-                System.out.println(ANSI.RED + "Invalid nickname. Allowed: letters, digits, '-', '_'." + ANSI.RESET);
+                System.out.println("Invalid nickname. Allowed characters: letters, digits, spaces, '-' and '_', or press Enter to keep current value.");
                 continue;
             }
+
             contact.setNickname(nickname);
             break;
         }
 
-        // Phone 1
+        // Phone 1 - digits only, at least 10 digits
         while (true) {
-            System.out.print(ANSI.CYAN + "Phone 1 [" + nullToEmpty(contact.getPhonePrimary()) + "] (digits only, min 10): " + ANSI.RESET);
+            System.out.print("Phone 1 [" + nullToEmpty(contact.getPhonePrimary()) + "] (digits only, min 10): ");
             String phone1 = scanner.nextLine().trim();
-            if (phone1.isEmpty()) break;
+
+            if (phone1.isEmpty()) {
+                break; // keep existing
+            }
+
             if (!ValidationUtils.isValidPhone(phone1)) {
-                System.out.println(ANSI.RED + "Invalid phone number. Use digits only, min 10 digits." + ANSI.RESET);
+                System.out.println("Invalid phone number. Use digits only and at least 10 digits.");
                 continue;
             }
+
             contact.setPhonePrimary(phone1);
             break;
         }
 
-        // Phone 2
+        // Phone 2 - optional
         while (true) {
-            System.out.print(ANSI.CYAN + "Phone 2 [" + nullToEmpty(contact.getPhoneSecondary()) + "] (optional, digits only, min 10 or Enter to keep): " + ANSI.RESET);
+            System.out.print("Phone 2 [" + nullToEmpty(contact.getPhoneSecondary()) + "] (optional, digits only, min 10 or Enter to keep): ");
             String phone2 = scanner.nextLine().trim();
-            if (phone2.isEmpty()) break;
+
+            if (phone2.isEmpty()) {
+                break; // keep existing
+            }
+
             if (!ValidationUtils.isValidPhone(phone2)) {
-                System.out.println(ANSI.RED + "Invalid phone number. Use digits only, min 10 digits." + ANSI.RESET);
+                System.out.println("Invalid phone number. Use digits only and at least 10 digits, or press Enter to keep the current value.");
                 continue;
             }
+
             contact.setPhoneSecondary(phone2);
             break;
         }
 
-        // Email
+        // Email - must have basic structure
         while (true) {
-            System.out.print(ANSI.CYAN + "Email [" + nullToEmpty(contact.getEmail()) + "]: " + ANSI.RESET);
+            System.out.print("Email [" + nullToEmpty(contact.getEmail()) + "]: ");
             String email = scanner.nextLine().trim();
-            if (email.isEmpty()) break;
+
+            if (email.isEmpty()) {
+                break; // keep existing
+            }
+
             if (!ValidationUtils.isValidEmail(email)) {
-                System.out.println(ANSI.RED + "Invalid email. Must contain '@' and domain." + ANSI.RESET);
+                System.out.println("Invalid email. It must contain '@', a domain with '.', and no spaces (e.g., user@example.com).");
                 continue;
             }
+
             contact.setEmail(email);
             break;
         }
 
-        System.out.print(ANSI.CYAN + "LinkedIn URL [" + nullToEmpty(contact.getLinkedinUrl()) + "]: " + ANSI.RESET);
+        System.out.print("LinkedIn URL [" + nullToEmpty(contact.getLinkedinUrl()) + "]: ");
         String linkedin = scanner.nextLine().trim();
-        if (!linkedin.isEmpty()) contact.setLinkedinUrl(linkedin);
+        if (!linkedin.isEmpty()) {
+            contact.setLinkedinUrl(linkedin);
+        }
 
-        String currentBirthDate = contact.getBirthDate() != null ? contact.getBirthDate().format(dateFormatter) : "N/A";
+        String currentBirthDate = contact.getBirthDate() != null
+                ? contact.getBirthDate().format(dateFormatter)
+                : "N/A";
 
         while (true) {
-            System.out.print(ANSI.CYAN + "Birth Date (" + currentBirthDate + ") [yyyy-MM-dd or Enter to keep]: " + ANSI.RESET);
+            System.out.print("Birth Date (" + currentBirthDate + ") [yyyy-MM-dd or Enter to keep]: ");
             String birthDateInput = scanner.nextLine().trim();
-            if (birthDateInput.isEmpty()) break;
+
+            if (birthDateInput.isEmpty()) {
+                // Keep existing value
+                break;
+            }
+
+            // Enforce strict yyyy-MM-dd pattern (e.g., 2002-05-05)
             if (!birthDateInput.matches("\\d{4}-\\d{2}-\\d{2}")) {
-                System.out.println(ANSI.RED + "Invalid format. Use yyyy-MM-dd." + ANSI.RESET);
+                System.out.println("Invalid format. Please enter the date exactly as yyyy-MM-dd (e.g., 2002-05-05).");
                 continue;
             }
+
             try {
                 LocalDate birthDate = LocalDate.parse(birthDateInput, dateFormatter);
                 contact.setBirthDate(birthDate);
                 break;
             } catch (DateTimeParseException e) {
-                System.out.println(ANSI.RED + "Invalid date value." + ANSI.RESET);
+                System.out.println("Invalid date value. Please enter a real calendar date in yyyy-MM-dd format.");
             }
         }
 
         if (contactDAO.update(contact)) {
-            System.out.println(ANSI.GREEN + "\nContact updated successfully!" + ANSI.RESET);
+            System.out.println("\nContact updated successfully!");
         } else {
-            System.out.println(ANSI.RED + "\nFailed to update contact." + ANSI.RESET);
+            System.out.println("\nFailed to update contact.");
         }
 
         System.out.println("Press Enter to continue...");
@@ -432,15 +508,15 @@ public class JuniorMenu extends BaseMenu {
     }
 
     private void changePassword() {
-        System.out.println(ANSI.BLUE + "\n--- Change Password ---" + ANSI.RESET);
+        System.out.println("\n--- Change Password ---");
         System.out.println("=======================================");
 
-        System.out.print(ANSI.CYAN + "Enter current password: " + ANSI.RESET);
+        System.out.print("Enter current password: ");
         String currentPassword = scanner.nextLine().trim();
 
         User currentUserFromDB = userDAO.findById(currentUser.getUserId());
         if (currentUserFromDB == null) {
-            System.out.println(ANSI.RED + "Error: Could not retrieve user information." + ANSI.RESET);
+            System.out.println("Error: Could not retrieve user information.");
             System.out.println("Press Enter to continue...");
             scanner.nextLine();
             return;
@@ -458,26 +534,26 @@ public class JuniorMenu extends BaseMenu {
         }
 
         if (!passwordMatches) {
-            System.out.println(ANSI.RED + "Current password is incorrect." + ANSI.RESET);
+            System.out.println("Current password is incorrect.");
             System.out.println("Press Enter to continue...");
             scanner.nextLine();
             return;
         }
 
-        System.out.print(ANSI.CYAN + "Enter new password: " + ANSI.RESET);
+        System.out.print("Enter new password: ");
         String newPassword = scanner.nextLine().trim();
         if (newPassword.isEmpty()) {
-            System.out.println(ANSI.RED + "Password cannot be empty." + ANSI.RESET);
+            System.out.println("Password cannot be empty.");
             System.out.println("Press Enter to continue...");
             scanner.nextLine();
             return;
         }
 
-        System.out.print(ANSI.CYAN + "Confirm new password: " + ANSI.RESET);
+        System.out.print("Confirm new password: ");
         String confirmPassword = scanner.nextLine().trim();
 
         if (!newPassword.equals(confirmPassword)) {
-            System.out.println(ANSI.RED + "Passwords do not match. Password not changed." + ANSI.RESET);
+            System.out.println("Passwords do not match. Password not changed.");
             System.out.println("Press Enter to continue...");
             scanner.nextLine();
             return;
@@ -487,15 +563,15 @@ public class JuniorMenu extends BaseMenu {
         userDAO.updatePasswordHash(currentUser.getUserId(), hashedPassword);
         currentUser.setPasswordHash(hashedPassword);
 
-        System.out.println(ANSI.GREEN + "Password changed successfully!" + ANSI.RESET);
+        System.out.println("Password changed successfully!");
         System.out.println("Press Enter to continue...");
         scanner.nextLine();
     }
 
     private void displayContactsTable(List<Contact> contacts) {
         System.out.printf("%-6s %-15s %-15s %-15s %-15s %-15s %-15s %-25s %-25s %-12s%n",
-                "ID", "First Name", "Middle Name", "Last Name", "Nickname",
-                "Phone 1", "Phone 2", "Email", "LinkedIn", "Birth Date");
+            "ID", "First Name", "Middle Name", "Last Name", "Nickname",
+            "Phone 1", "Phone 2", "Email", "LinkedIn", "Birth Date");
         System.out.println("--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
 
         DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
@@ -523,16 +599,16 @@ public class JuniorMenu extends BaseMenu {
             if (linkedinUrl.length() > 23) linkedinUrl = linkedinUrl.substring(0, 20) + "...";
 
             System.out.printf("%-6d %-15s %-15s %-15s %-15s %-15s %-15s %-25s %-25s %-12s%n",
-                    contact.getContactId(),
-                    firstName,
-                    middleName.isEmpty() ? "N/A" : middleName,
-                    lastName,
-                    nickname.isEmpty() ? "N/A" : nickname,
-                    phonePrimary.isEmpty() ? "N/A" : phonePrimary,
-                    phoneSecondary.isEmpty() ? "N/A" : phoneSecondary,
-                    email.isEmpty() ? "N/A" : email,
-                    linkedinUrl.isEmpty() ? "N/A" : linkedinUrl,
-                    birthDate);
+                contact.getContactId(),
+                firstName,
+                middleName.isEmpty() ? "N/A" : middleName,
+                lastName,
+                nickname.isEmpty() ? "N/A" : nickname,
+                phonePrimary.isEmpty() ? "N/A" : phonePrimary,
+                phoneSecondary.isEmpty() ? "N/A" : phoneSecondary,
+                email.isEmpty() ? "N/A" : email,
+                linkedinUrl.isEmpty() ? "N/A" : linkedinUrl,
+                birthDate);
         }
 
         System.out.println("--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
@@ -542,3 +618,5 @@ public class JuniorMenu extends BaseMenu {
         return value == null ? "" : value;
     }
 }
+
+

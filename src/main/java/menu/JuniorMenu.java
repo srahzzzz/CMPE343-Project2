@@ -26,7 +26,7 @@ import java.util.Map;
  * - Sort results
  * - Update existing contact
  * </p>
- * author sarah nauman
+ * @author sarah nauman
  */
 public class JuniorMenu extends BaseMenu {
 
@@ -491,6 +491,10 @@ public class JuniorMenu extends BaseMenu {
 
             try {
                 LocalDate birthDate = LocalDate.parse(birthDateInput, dateFormatter);
+                if (!ValidationUtils.isValidPastOrToday(birthDate)) {
+                    System.out.println(ColorUtils.error("Birth date cannot be in the future. Please enter a past or today's date."));
+                    continue;
+                }
                 contact.setBirthDate(birthDate);
                 break;
             } catch (DateTimeParseException e) {

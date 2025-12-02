@@ -1,5 +1,7 @@
 package service;
 
+import java.time.LocalDate;
+
 /**
  * Simple validation helpers for user input (phone numbers, emails, names, etc.).
  * @author sarah nauman
@@ -114,6 +116,19 @@ public final class ValidationUtils {
             }
         }
         return true;
+    }
+
+    /**
+     * Checks that a birth date is not in the future.
+     *
+     * @param birthDate the birth date to validate
+     * @return true if the date is today or in the past, false if it is in the future
+     */
+    public static boolean isValidPastOrToday(LocalDate birthDate) {
+        if (birthDate == null) {
+            return true; // null means \"unknown\" / optional
+        }
+        return !birthDate.isAfter(LocalDate.now());
     }
 }
 

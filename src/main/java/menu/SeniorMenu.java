@@ -515,6 +515,13 @@ public class SeniorMenu extends BaseMenu {
 
             try {
                 LocalDate birthDate = LocalDate.parse(birthDateInput, dateFormatter);
+                
+                // Check if date is in the future
+                if (!ValidationUtils.isValidPastDate(birthDate)) {
+                    System.out.println(ColorUtils.error("Birth date cannot be in the future. Please enter a past date or today's date."));
+                    continue;
+                }
+                
                 contact.setBirthDate(birthDate);
                 break;
             } catch (DateTimeParseException e) {
@@ -710,6 +717,13 @@ public class SeniorMenu extends BaseMenu {
 
             try {
                 LocalDate birthDate = LocalDate.parse(birthDateInput, dateFormatter);
+                
+                // Check if date is in the future
+                if (!ValidationUtils.isValidPastDate(birthDate)) {
+                    System.out.println(ColorUtils.error("Birth date cannot be in the future. Please enter a past date or today's date."));
+                    continue;
+                }
+                
                 contact.setBirthDate(birthDate);
                 break;
             } catch (DateTimeParseException e) {

@@ -151,14 +151,49 @@ public class UserDAO {
     }
 
     /**
+     * Resets the AUTO_INCREMENT value to MAX(user_id) + 1.
+     * This ensures that new users always get the next sequential ID,
+     * regardless of deletions.
+     *
+     * @author sarah nauman
+     */
+    private void resetAutoIncrement() {
+        try {
+            // Get the maximum user_id
+            String maxQuery = "SELECT MAX(user_id) as max_id FROM users";
+            PreparedStatement ps = DBConnection.getConnection().prepareStatement(maxQuery);
+            ResultSet rs = ps.executeQuery();
+            
+            int nextId = 1; // Default if table is empty
+            if (rs.next() && rs.getObject("max_id") != null) {
+                nextId = rs.getInt("max_id") + 1;
+            }
+            
+            // Reset AUTO_INCREMENT to the next sequential ID
+            String alterQuery = "ALTER TABLE users AUTO_INCREMENT = ?";
+            ps = DBConnection.getConnection().prepareStatement(alterQuery);
+            ps.setInt(1, nextId);
+            ps.executeUpdate();
+            
+        } catch (SQLException e) {
+            // Silently fail - AUTO_INCREMENT will still work, just might have gaps
+            // This is not critical enough to stop the operation
+        }
+    }
+
+    /**
      * Creates a new user in the database.
      * The password should already be hashed before calling this method.
+     * Ensures AUTO_INCREMENT is set correctly before inserting.
      *
      * @param user the User object containing user information (password must be hashed)
      * @return true if user was created successfully, false otherwise
      * @author sarah nauman
      */
     public boolean create(User user) {
+        // Reset AUTO_INCREMENT to ensure sequential IDs
+        resetAutoIncrement();
+        
         String query = "INSERT INTO users (username, password_hash, name, surname, role) VALUES (?, ?, ?, ?, ?)";
 
         try {

@@ -173,5 +173,24 @@ public abstract class BaseMenu {
     protected int getLogoutOption() {
         return 0; // Default logout option
     }
+
+    /**
+     * Waits for the user to press Enter (and only Enter).
+     * Ignores any other input (Tab, spaces, characters, etc.) and only proceeds
+     * when Enter is pressed with no other characters.
+     *
+     * @author sarah nauman
+     */
+    protected void waitForEnter() {
+        String input;
+        do {
+            input = scanner.nextLine();
+            // Only proceed if input is empty (just Enter was pressed)
+            if (input.trim().isEmpty()) {
+                break; // Empty input = Enter was pressed, proceed
+            }
+            // Non-empty input (Tab, spaces, characters, etc.), ignore and wait again
+        } while (true);
+    }
 }
 

@@ -88,7 +88,7 @@ public class TesterMenu extends BaseMenu {
         }
         
         System.out.println("\n" + ColorUtils.testerPrompt("Press Enter to continue..."));
-        scanner.nextLine();
+        waitForEnter();
     }
 
     /**
@@ -110,7 +110,7 @@ public class TesterMenu extends BaseMenu {
         if (choice == null || choice < 1 || choice > 4) {
             System.out.println(ColorUtils.error("Invalid choice. Please select 1, 2, 3, or 4."));
             System.out.println(ColorUtils.testerPrompt("Press Enter to continue..."));
-            scanner.nextLine();
+            waitForEnter();
             return;
         }
         
@@ -181,7 +181,7 @@ public class TesterMenu extends BaseMenu {
         }
         
         System.out.println("\n" + ColorUtils.testerPrompt("Press Enter to continue..."));
-        scanner.nextLine();
+        waitForEnter();
     }
 
     /**
@@ -235,7 +235,7 @@ public class TesterMenu extends BaseMenu {
         if (criteria.isEmpty()) {
             System.out.println("\n" + ColorUtils.error("No search criteria provided. Please enter at least one field."));
             System.out.println(ColorUtils.testerPrompt("Press Enter to continue..."));
-            scanner.nextLine();
+            waitForEnter();
             return;
         }
         
@@ -250,7 +250,7 @@ public class TesterMenu extends BaseMenu {
         }
         
         System.out.println("\n" + ColorUtils.testerPrompt("Press Enter to continue..."));
-        scanner.nextLine();
+        waitForEnter();
     }
 
     /**
@@ -274,7 +274,7 @@ public class TesterMenu extends BaseMenu {
         if (choice == null || choice < 1 || choice > 5) {
             System.out.println(ColorUtils.error("Invalid choice."));
             System.out.println(ColorUtils.testerPrompt("Press Enter to continue..."));
-            scanner.nextLine();
+            waitForEnter();
             return;
         }
         
@@ -317,7 +317,7 @@ public class TesterMenu extends BaseMenu {
         }
         
         System.out.println("\n" + ColorUtils.testerPrompt("Press Enter to continue..."));
-        scanner.nextLine();
+        waitForEnter();
     }
 
     /**
@@ -338,7 +338,7 @@ public class TesterMenu extends BaseMenu {
         if (currentUserFromDB == null) {
             System.out.println(ColorUtils.error("Error: Could not retrieve user information."));
             System.out.println(ColorUtils.testerPrompt("Press Enter to continue..."));
-            scanner.nextLine();
+            waitForEnter();
             return;
         }
         
@@ -357,7 +357,7 @@ public class TesterMenu extends BaseMenu {
         if (!passwordMatches) {
             System.out.println(ColorUtils.error("Current password is incorrect."));
             System.out.println(ColorUtils.testerPrompt("Press Enter to continue..."));
-            scanner.nextLine();
+            waitForEnter();
             return;
         }
         
@@ -367,7 +367,7 @@ public class TesterMenu extends BaseMenu {
         if (newPassword.isEmpty()) {
             System.out.println(ColorUtils.error("Password cannot be empty."));
             System.out.println(ColorUtils.testerPrompt("Press Enter to continue..."));
-            scanner.nextLine();
+            waitForEnter();
             return;
         }
         
@@ -377,7 +377,7 @@ public class TesterMenu extends BaseMenu {
         if (!newPassword.equals(confirmPassword)) {
             System.out.println(ColorUtils.error("Passwords do not match. Password not changed."));
             System.out.println(ColorUtils.testerPrompt("Press Enter to continue..."));
-            scanner.nextLine();
+            waitForEnter();
             return;
         }
         

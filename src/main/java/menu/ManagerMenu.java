@@ -39,7 +39,7 @@ public class ManagerMenu extends BaseMenu {
 
     @Override
     protected void displayMenu() {
-        System.out.println(ColorUtils.managerMenuOption("1. Contacts statistical info"));
+        System.out.println(ColorUtils.managerMenuOption("1. Statistical info of Contacts"));
         System.out.println(ColorUtils.managerMenuOption("2. List all users"));
         System.out.println(ColorUtils.managerMenuOption("3. Update user"));
         System.out.println(ColorUtils.managerMenuOption("4. Add new user"));
@@ -79,7 +79,7 @@ public class ManagerMenu extends BaseMenu {
      * Shows various statistics about contacts including counts, names, ages, and LinkedIn presence.
      */
     private void showStatistics() {
-        System.out.println("\n" + ColorUtils.header("--- Contacts Statistical Info ---"));
+        System.out.println("\n" + ColorUtils.header("--- Statistical Information of Contacts---"));
         System.out.println(ColorUtils.header("======================================="));
         
         java.util.Map<String, Object> stats = contactDAO.getStatistics();
@@ -87,7 +87,7 @@ public class ManagerMenu extends BaseMenu {
         if (stats.isEmpty()) {
             System.out.println(ColorUtils.error("Unable to retrieve statistics. Please check database connection."));
             System.out.println(ColorUtils.managerPrompt("Press Enter to continue..."));
-            scanner.nextLine();
+            waitForEnter();
             return;
         }
         
@@ -136,7 +136,7 @@ public class ManagerMenu extends BaseMenu {
         
         System.out.println("\n" + ColorUtils.header("======================================="));
         System.out.println(ColorUtils.managerPrompt("Press Enter to continue..."));
-        scanner.nextLine();
+        waitForEnter();
     }
 
     /**
@@ -169,7 +169,7 @@ public class ManagerMenu extends BaseMenu {
         }
         
         System.out.println("\n" + ColorUtils.managerPrompt("Press Enter to continue..."));
-        scanner.nextLine();
+        waitForEnter();
     }
 
     /**
@@ -188,7 +188,7 @@ public class ManagerMenu extends BaseMenu {
         if (userId == null) {
             System.out.println(ColorUtils.error("Invalid user ID. Please enter a valid number."));
             System.out.println(ColorUtils.managerPrompt("Press Enter to continue..."));
-            scanner.nextLine();
+            waitForEnter();
             return;
         }
         
@@ -196,7 +196,7 @@ public class ManagerMenu extends BaseMenu {
         if (user == null) {
             System.out.println(ColorUtils.error("User with ID " + userId + " not found."));
             System.out.println(ColorUtils.managerPrompt("Press Enter to continue..."));
-            scanner.nextLine();
+            waitForEnter();
             return;
         }
         
@@ -264,7 +264,7 @@ public class ManagerMenu extends BaseMenu {
         }
         
         System.out.println(ColorUtils.managerPrompt("Press Enter to continue..."));
-        scanner.nextLine();
+        waitForEnter();
     }
 
     /**
@@ -283,7 +283,7 @@ public class ManagerMenu extends BaseMenu {
         if (username.isEmpty()) {
             System.out.println(ColorUtils.error("Username cannot be empty. User creation cancelled."));
             System.out.println(ColorUtils.managerPrompt("Press Enter to continue..."));
-            scanner.nextLine();
+            waitForEnter();
             return;
         }
         newUser.setUsername(username);
@@ -294,7 +294,7 @@ public class ManagerMenu extends BaseMenu {
         if (password.isEmpty()) {
             System.out.println(ColorUtils.error("Password cannot be empty. User creation cancelled."));
             System.out.println(ColorUtils.managerPrompt("Press Enter to continue..."));
-            scanner.nextLine();
+            waitForEnter();
             return;
         }
         String hashedPassword = AuthService.hashPassword(password);
@@ -306,7 +306,7 @@ public class ManagerMenu extends BaseMenu {
         if (name.isEmpty()) {
             System.out.println(ColorUtils.error("Name cannot be empty. User creation cancelled."));
             System.out.println(ColorUtils.managerPrompt("Press Enter to continue..."));
-            scanner.nextLine();
+            waitForEnter();
             return;
         }
         newUser.setName(name);
@@ -317,7 +317,7 @@ public class ManagerMenu extends BaseMenu {
         if (surname.isEmpty()) {
             System.out.println(ColorUtils.error("Surname cannot be empty. User creation cancelled."));
             System.out.println(ColorUtils.managerPrompt("Press Enter to continue..."));
-            scanner.nextLine();
+            waitForEnter();
             return;
         }
         newUser.setSurname(surname);
@@ -345,7 +345,7 @@ public class ManagerMenu extends BaseMenu {
         }
         
         System.out.println(ColorUtils.managerPrompt("Press Enter to continue..."));
-        scanner.nextLine();
+        waitForEnter();
     }
 
     /**
@@ -363,7 +363,7 @@ public class ManagerMenu extends BaseMenu {
         if (userId == null) {
             System.out.println(ColorUtils.error("Invalid user ID. Please enter a valid number."));
             System.out.println(ColorUtils.managerPrompt("Press Enter to continue..."));
-            scanner.nextLine();
+            waitForEnter();
             return;
         }
         
@@ -372,7 +372,7 @@ public class ManagerMenu extends BaseMenu {
         if (user == null) {
             System.out.println(ColorUtils.error("User with ID " + userId + " not found."));
             System.out.println(ColorUtils.managerPrompt("Press Enter to continue..."));
-            scanner.nextLine();
+            waitForEnter();
             return;
         }
         
@@ -380,7 +380,7 @@ public class ManagerMenu extends BaseMenu {
         if (user.getUserId() == currentUser.getUserId()) {
             System.out.println(ColorUtils.error("You cannot delete your own account!"));
             System.out.println(ColorUtils.managerPrompt("Press Enter to continue..."));
-            scanner.nextLine();
+            waitForEnter();
             return;
         }
         
@@ -391,11 +391,20 @@ public class ManagerMenu extends BaseMenu {
         System.out.println(ColorUtils.info("Name: " + user.getName() + " " + user.getSurname()));
         System.out.println(ColorUtils.info("Role: " + user.getRole()));
 
-        // need to add check ????????
-        System.out.print("\n" + ColorUtils.managerPrompt("Are you sure you want to delete this user? (yes/no): "));
-        String confirm = scanner.nextLine().trim().toLowerCase();
+        // Strict y/n validation
+        String confirm;
+        while (true) {
+            System.out.print("\n" + ColorUtils.managerPrompt("Are you sure you want to delete this user? (y/n): "));
+            confirm = scanner.nextLine().trim().toLowerCase();
+            
+            if (confirm.equals("y") || confirm.equals("n")) {
+                break;
+            }
+            
+            System.out.println(ColorUtils.error("Invalid choice. Please enter 'y' or 'n'."));
+        }
         
-        if (confirm.equals("yes") || confirm.equals("y")) {
+        if (confirm.equals("y")) {
             if (userDAO.delete(userId)) {
                 System.out.println(ColorUtils.success("User deleted successfully!"));
             } else {
@@ -406,7 +415,7 @@ public class ManagerMenu extends BaseMenu {
         }
         
         System.out.println(ColorUtils.managerPrompt("Press Enter to continue..."));
-        scanner.nextLine();
+        waitForEnter();
     }
 
     /**
@@ -424,7 +433,7 @@ public class ManagerMenu extends BaseMenu {
         if (currentUserFromDB == null) {
             System.out.println(ColorUtils.error("Error: Could not retrieve user information."));
             System.out.println(ColorUtils.managerPrompt("Press Enter to continue..."));
-            scanner.nextLine();
+            waitForEnter();
             return;
         }
         
@@ -443,7 +452,7 @@ public class ManagerMenu extends BaseMenu {
         if (!passwordMatches) {
             System.out.println(ColorUtils.error("Current password is incorrect."));
             System.out.println(ColorUtils.managerPrompt("Press Enter to continue..."));
-            scanner.nextLine();
+            waitForEnter();
             return;
         }
         
@@ -453,7 +462,7 @@ public class ManagerMenu extends BaseMenu {
         if (newPassword.isEmpty()) {
             System.out.println(ColorUtils.error("Password cannot be empty."));
             System.out.println(ColorUtils.managerPrompt("Press Enter to continue..."));
-            scanner.nextLine();
+            waitForEnter();
             return;
         }
         
@@ -463,7 +472,7 @@ public class ManagerMenu extends BaseMenu {
         if (!newPassword.equals(confirmPassword)) {
             System.out.println(ColorUtils.error("Passwords do not match. Password not changed."));
             System.out.println(ColorUtils.managerPrompt("Press Enter to continue..."));
-            scanner.nextLine();
+            waitForEnter();
             return;
         }
         
@@ -475,7 +484,7 @@ public class ManagerMenu extends BaseMenu {
         currentUser.setPasswordHash(hashedPassword);
         
         System.out.println(ColorUtils.managerPrompt("Press Enter to continue..."));
-        scanner.nextLine();
+        waitForEnter();
     }
 }
 

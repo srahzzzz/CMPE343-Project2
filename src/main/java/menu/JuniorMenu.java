@@ -17,7 +17,7 @@ import java.util.Map;
 
 /**
  * Menu for Junior Developer role.
- *
+ * 
  * <p>Junior Developers can:
  * - Change password
  * - Logout
@@ -95,7 +95,7 @@ public class JuniorMenu extends BaseMenu {
         }
         
         System.out.println("\n" + ColorUtils.juniorPrompt("Press Enter to continue..."));
-        scanner.nextLine();
+        waitForEnter();
     }
 
     private void searchByField() {
@@ -113,7 +113,7 @@ public class JuniorMenu extends BaseMenu {
         if (choice == null || choice < 1 || choice > 4) {
             System.out.println(ColorUtils.error("Invalid choice. Please select 1, 2, 3, or 4."));
             System.out.println(ColorUtils.juniorPrompt("Press Enter to continue..."));
-            scanner.nextLine();
+            waitForEnter();
             return;
         }
 
@@ -183,7 +183,7 @@ public class JuniorMenu extends BaseMenu {
         }
         
         System.out.println("\n" + ColorUtils.juniorPrompt("Press Enter to continue..."));
-        scanner.nextLine();
+        waitForEnter();
     }
 
     private void searchByMultipleFields() {
@@ -231,7 +231,7 @@ public class JuniorMenu extends BaseMenu {
         if (criteria.isEmpty()) {
             System.out.println("\n" + ColorUtils.error("No search criteria provided. Please enter at least one field."));
             System.out.println(ColorUtils.juniorPrompt("Press Enter to continue..."));
-            scanner.nextLine();
+            waitForEnter();
             return;
         }
 
@@ -246,7 +246,7 @@ public class JuniorMenu extends BaseMenu {
         }
         
         System.out.println("\n" + ColorUtils.juniorPrompt("Press Enter to continue..."));
-        scanner.nextLine();
+        waitForEnter();
     }
 
     private void sortContacts() {
@@ -266,7 +266,7 @@ public class JuniorMenu extends BaseMenu {
         if (choice == null || choice < 1 || choice > 5) {
             System.out.println(ColorUtils.error("Invalid choice."));
             System.out.println(ColorUtils.juniorPrompt("Press Enter to continue..."));
-            scanner.nextLine();
+            waitForEnter();
             return;
         }
 
@@ -306,7 +306,7 @@ public class JuniorMenu extends BaseMenu {
         }
         
         System.out.println("\n" + ColorUtils.juniorPrompt("Press Enter to continue..."));
-        scanner.nextLine();
+        waitForEnter();
     }
 
     private void updateContact() {
@@ -320,7 +320,7 @@ public class JuniorMenu extends BaseMenu {
         if (contactId == null) {
             System.out.println(ColorUtils.error("Invalid contact ID. Please enter a valid number."));
             System.out.println(ColorUtils.juniorPrompt("Press Enter to continue..."));
-            scanner.nextLine();
+            waitForEnter();
             return;
         }
 
@@ -328,7 +328,7 @@ public class JuniorMenu extends BaseMenu {
         if (contact == null) {
             System.out.println(ColorUtils.error("Contact with ID " + contactId + " not found."));
             System.out.println(ColorUtils.juniorPrompt("Press Enter to continue..."));
-            scanner.nextLine();
+            waitForEnter();
             return;
         }
 
@@ -456,7 +456,7 @@ public class JuniorMenu extends BaseMenu {
             }
 
             if (!ValidationUtils.isValidEmail(email)) {
-                System.out.println(ColorUtils.error("Invalid email. It must contain '@', a domain with '.', and no spaces (e.g., user@example.com)."));
+                System.out.println(ColorUtils.error("Invalid email. It must contain '@' and '.', and no spaces (e.g user@gmail.com)."));
                 continue;
             }
 
@@ -509,7 +509,7 @@ public class JuniorMenu extends BaseMenu {
         }
 
         System.out.println(ColorUtils.juniorPrompt("Press Enter to continue..."));
-        scanner.nextLine();
+        waitForEnter();
     }
 
     private void changePassword() {
@@ -523,7 +523,7 @@ public class JuniorMenu extends BaseMenu {
         if (currentUserFromDB == null) {
             System.out.println(ColorUtils.error("Error: Could not retrieve user information."));
             System.out.println(ColorUtils.juniorPrompt("Press Enter to continue..."));
-            scanner.nextLine();
+            waitForEnter();
             return;
         }
 
@@ -541,7 +541,7 @@ public class JuniorMenu extends BaseMenu {
         if (!passwordMatches) {
             System.out.println(ColorUtils.error("Current password is incorrect."));
             System.out.println(ColorUtils.juniorPrompt("Press Enter to continue..."));
-            scanner.nextLine();
+            waitForEnter();
             return;
         }
 
@@ -550,7 +550,7 @@ public class JuniorMenu extends BaseMenu {
         if (newPassword.isEmpty()) {
             System.out.println(ColorUtils.error("Password cannot be empty."));
             System.out.println(ColorUtils.juniorPrompt("Press Enter to continue..."));
-            scanner.nextLine();
+            waitForEnter();
             return;
         }
 
@@ -560,7 +560,7 @@ public class JuniorMenu extends BaseMenu {
         if (!newPassword.equals(confirmPassword)) {
             System.out.println(ColorUtils.error("Passwords do not match. Password not changed."));
             System.out.println(ColorUtils.juniorPrompt("Press Enter to continue..."));
-            scanner.nextLine();
+            waitForEnter();
             return;
         }
 
@@ -570,7 +570,7 @@ public class JuniorMenu extends BaseMenu {
 
         System.out.println(ColorUtils.success("Password changed successfully!"));
         System.out.println(ColorUtils.juniorPrompt("Press Enter to continue..."));
-        scanner.nextLine();
+        waitForEnter();
     }
 
     private void displayContactsTable(List<Contact> contacts) {

@@ -90,14 +90,49 @@ public class ContactDAO {
     }
 
     /**
+     * Resets the AUTO_INCREMENT value to MAX(contact_id) + 1.
+     * This ensures that new contacts always get the next sequential ID,
+     * regardless of deletions.
+     *
+     * @author sarah nauman
+     */
+    private void resetAutoIncrement() {
+        try {
+            // Get the maximum contact_id
+            String maxQuery = "SELECT MAX(contact_id) as max_id FROM contacts";
+            PreparedStatement ps = DBConnection.getConnection().prepareStatement(maxQuery);
+            ResultSet rs = ps.executeQuery();
+            
+            int nextId = 1; // Default if table is empty
+            if (rs.next() && rs.getObject("max_id") != null) {
+                nextId = rs.getInt("max_id") + 1;
+            }
+            
+            // Reset AUTO_INCREMENT to the next sequential ID
+            String alterQuery = "ALTER TABLE contacts AUTO_INCREMENT = ?";
+            ps = DBConnection.getConnection().prepareStatement(alterQuery);
+            ps.setInt(1, nextId);
+            ps.executeUpdate();
+            
+        } catch (SQLException e) {
+            // Silently fail - AUTO_INCREMENT will still work, just might have gaps
+            // This is not critical enough to stop the operation
+        }
+    }
+
+    /**
      * Creates a new contact in the database.
      * Inserts a new contact record with all provided information.
+     * Ensures AUTO_INCREMENT is set correctly before inserting.
      *
      * @param contact the Contact object containing contact information
      * @return true if contact was created successfully, false otherwise
      * @author sarah nauman
      */
     public boolean create(Contact contact) {
+        // Reset AUTO_INCREMENT to ensure sequential IDs
+        resetAutoIncrement();
+        
         String query = "INSERT INTO contacts (first_name, middle_name, last_name, nickname, " +
                 "phone_primary, phone_secondary, email, linkedin_url, birth_date) " +
                 "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";

@@ -117,6 +117,13 @@ public abstract class BaseMenu {
                         System.exit(0);
                     } else {
                         System.out.println("\n" + ColorUtils.info("Logging out... Returning to login screen..."));
+                        // Small delay to show logout message, then clear screen
+                        try {
+                            Thread.sleep(1000); // 1 second delay
+                        } catch (InterruptedException e) {
+                            Thread.currentThread().interrupt();
+                        }
+                        clearConsole();
                         running = false; // leave menu and go back to login loop
                     }
                 } else {
@@ -191,6 +198,24 @@ public abstract class BaseMenu {
             }
             // Non-empty input (Tab, spaces, characters, etc.), ignore and wait again
         } while (true);
+    }
+
+    /**
+     * Clears the console screen.
+     * Uses ANSI escape codes for clearing, with fallback for unsupported terminals.
+     */
+    protected void clearConsole() {
+        try {
+            // Use ANSI escape codes to clear screen and move cursor to top-left
+            System.out.print("\u001B[2J\u001B[H");
+            System.out.flush();
+        } catch (Exception e) {
+            // Fallback: print many blank lines to clear visible area
+            for (int i = 0; i < 100; i++) {
+                System.out.println();
+            }
+            System.out.flush();
+        }
     }
 }
 

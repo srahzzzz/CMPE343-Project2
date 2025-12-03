@@ -4352,23 +4352,43 @@ public class Main {
     // Clear console between frames
     static void clearConsole() {
         try {
-            // Clear screen and move cursor to top-left
-            System.out.print("\033[H\033[2J");
+            // Use ANSI escape codes to clear screen and move cursor to top-left
+            // Sequence: ESC[2J clears screen, ESC[H moves cursor to home
+            System.out.print("\u001B[2J\u001B[H");
             System.out.flush();
         } catch (Exception e) {
-            System.out.println(RED + "Unable to clear console." + RESET);
+            // Fallback: print many blank lines to clear visible area
+            for (int i = 0; i < 100; i++) {
+                System.out.println();
+            }
+            System.out.flush();
         }
     }
 
     public static void main(String[] args) throws InterruptedException {
+        // Enable ANSI support
+        try {
+            if (System.getProperty("os.name").toLowerCase().contains("win")) {
+                // Enable ANSI escape sequences
+                ProcessBuilder pb = new ProcessBuilder("cmd", "/c", "echo", "");
+                pb.start();
+            }
+        } catch (Exception e) {
+            // Ignore if ANSI enabling fails
+        }
 
         int delayMs = 40;
         for (int i = 0; i < FRAME.length; i++) {
             if (FRAME[i] == null) continue;
 
+            // Clear console first
             clearConsole();
+            
+            // Print frame - frames already contain newlines from text blocks
             System.out.print(YELLOW + FRAME[i] + RESET);
             System.out.flush();
+            
+            // Delay to show frame before moving to next
             Thread.sleep(delayMs);
         }
 

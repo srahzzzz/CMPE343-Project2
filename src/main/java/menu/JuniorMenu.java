@@ -490,6 +490,34 @@ public class JuniorMenu extends BaseMenu {
             }
 
             try {
+                // Parse the date components for validation
+                String[] parts = birthDateInput.split("-");
+                int year = Integer.parseInt(parts[0]);
+                int month = Integer.parseInt(parts[1]);
+                int day = Integer.parseInt(parts[2]);
+                
+                // Validate month
+                if (month < 1 || month > 12) {
+                    System.out.println(ColorUtils.error("Invalid month. Month must be between 1 and 12."));
+                    continue;
+                }
+                
+                // Validate day based on month
+                int maxDays = getMaxDaysInMonth(month, year);
+                if (day < 1 || day > maxDays) {
+                    String monthName = getMonthName(month);
+                    if (month == 2 && day == 29) {
+                        if (!isLeapYear(year)) {
+                            System.out.println(ColorUtils.error("Invalid date. February 29 does not exist in " + year + " (not a leap year). February has 28 days in non-leap years."));
+                        } else {
+                            System.out.println(ColorUtils.error("Invalid date. Day must be between 1 and " + maxDays + " for " + monthName + "."));
+                        }
+                    } else {
+                        System.out.println(ColorUtils.error("Invalid date. " + monthName + " only has " + maxDays + " day(s). Please enter a valid day (1-" + maxDays + ")."));
+                    }
+                    continue;
+                }
+                
                 LocalDate birthDate = LocalDate.parse(birthDateInput, dateFormatter);
                 if (!ValidationUtils.isValidPastOrToday(birthDate)) {
                     System.out.println(ColorUtils.error("Birth date cannot be in the future. Please enter a past or today's date."));
@@ -499,6 +527,8 @@ public class JuniorMenu extends BaseMenu {
                 break;
             } catch (DateTimeParseException e) {
                 System.out.println(ColorUtils.error("Invalid date value. Please enter a real calendar date in yyyy-MM-dd format."));
+            } catch (NumberFormatException | ArrayIndexOutOfBoundsException e) {
+                System.out.println(ColorUtils.error("Invalid date format. Please enter the date as yyyy-MM-dd (e.g., 2002-05-05)."));
             }
         }
 
@@ -621,6 +651,54 @@ public class JuniorMenu extends BaseMenu {
 
     private String nullToEmpty(String value) {
         return value == null ? "" : value;
+    }
+    
+    /**
+     * Gets the maximum number of days in a given month, accounting for leap years.
+     * 
+     * @param month the month (1-12)
+     * @param year the year (for leap year calculation)
+     * @return the maximum number of days in the month
+     */
+    private int getMaxDaysInMonth(int month, int year) {
+        switch (month) {
+            case 1: case 3: case 5: case 7: case 8: case 10: case 12:
+                return 31;
+            case 4: case 6: case 9: case 11:
+                return 30;
+            case 2:
+                return isLeapYear(year) ? 29 : 28;
+            default:
+                return 31;
+        }
+    }
+    
+    /**
+     * Checks if a year is a leap year.
+     * A year is a leap year if it is divisible by 4, but not by 100 unless also divisible by 400.
+     * 
+     * @param year the year to check
+     * @return true if the year is a leap year, false otherwise
+     */
+    private boolean isLeapYear(int year) {
+        return (year % 4 == 0 && year % 100 != 0) || (year % 400 == 0);
+    }
+    
+    /**
+     * Gets the name of a month.
+     * 
+     * @param month the month number (1-12)
+     * @return the name of the month
+     */
+    private String getMonthName(int month) {
+        String[] monthNames = {
+            "January", "February", "March", "April", "May", "June",
+            "July", "August", "September", "October", "November", "December"
+        };
+        if (month >= 1 && month <= 12) {
+            return monthNames[month - 1];
+        }
+        return "Invalid Month";
     }
 }
 

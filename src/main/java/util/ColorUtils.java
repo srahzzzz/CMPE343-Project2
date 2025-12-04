@@ -19,6 +19,7 @@ public class ColorUtils {
     public static final String MAGENTA = "\033[35m";
     public static final String CYAN = "\033[36m";
     public static final String WHITE = "\033[37m";
+    public static final String BROWN = "\033[38;5;94m";
     
     // Bright colors
     public static final String BRIGHT_BLACK = "\033[90m";
@@ -112,6 +113,7 @@ public class ColorUtils {
         return BRIGHT_CYAN + text + RESET;
     }
     
+    /** @param text the text to color for Tester menu options */
     public static String testerMenuOption(String text) {
         return CYAN + text + RESET;
     }
@@ -123,6 +125,7 @@ public class ColorUtils {
         return BRIGHT_MAGENTA + text + RESET;
     }
     
+    /** @param text the text to color for Junior menu options */
     public static String juniorMenuOption(String text) {
         return MAGENTA + text + RESET;
     }
@@ -134,6 +137,7 @@ public class ColorUtils {
         return BRIGHT_GREEN + text + RESET;
     }
     
+    /** @param text the text to color for Senior menu options */
     public static String seniorMenuOption(String text) {
         return GREEN + text + RESET;
     }
@@ -145,6 +149,7 @@ public class ColorUtils {
         return BRIGHT_YELLOW + text + RESET;
     }
     
+    /** @param text the text to color for Manager menu options */
     public static String managerMenuOption(String text) {
         return YELLOW + text + RESET;
     }

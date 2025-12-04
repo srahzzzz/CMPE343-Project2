@@ -603,6 +603,10 @@ public class JuniorMenu extends BaseMenu {
         waitForEnter();
     }
 
+    /**
+     * Displays contacts in a formatted table.
+     * @param contacts the list of contacts to display
+     */
     private void displayContactsTable(List<Contact> contacts) {
         System.out.printf(ColorUtils.header("%-6s %-15s %-15s %-15s %-15s %-15s %-15s %-25s %-25s %-12s%n"),
             "ID", "First Name", "Middle Name", "Last Name", "Nickname",
@@ -649,6 +653,11 @@ public class JuniorMenu extends BaseMenu {
         System.out.println("--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
     }
 
+    /**
+     * Converts null string to empty string for display purposes.
+     * @param value the string value (may be null)
+     * @return empty string if value is null, otherwise the value itself
+     */
     private String nullToEmpty(String value) {
         return value == null ? "" : value;
     }

@@ -1,7 +1,11 @@
 package menu;
 
 import model.User;
+import runninghorse.HorseFrames;
+import runninghorse.RunningHorseAnimator;
 import util.ColorUtils;
+
+import java.util.Arrays;
 import java.util.Scanner;
 
 /**
@@ -113,7 +117,12 @@ public abstract class BaseMenu {
                     }
 
                     if (confirm.equals("y")) {
-                        System.out.println("\n" + ColorUtils.info("Terminating program... Goodbye!"));
+                        // Play colorful 3D ASCII donut animation for ~5 seconds, then terminate.
+                        try {
+                            util.DonutAnimation.play(5000);
+                        } catch (Exception e) {
+                            // If anything goes wrong with the animation
+                        }
                         System.exit(0);
                     } else {
                         System.out.println("\n" + ColorUtils.info("Logging out... Returning to login screen..."));

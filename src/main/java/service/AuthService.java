@@ -171,10 +171,10 @@ public class AuthService {
         RunningHorseAnimator horseAnimator =
                 new RunningHorseAnimator(
                         Arrays.asList(HorseFrames.FRAMES),
-                        30,
+                        50,
                         true,
                         horseColor
                 );
-        horseAnimator.runForDuration(1500);
+        horseAnimator.runForDuration(1700);
     }
 }

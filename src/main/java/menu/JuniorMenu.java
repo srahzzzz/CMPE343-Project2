@@ -7,6 +7,7 @@ import model.User;
 import service.AuthService;
 import service.ValidationUtils;
 import util.ColorUtils;
+import util.UndoManager;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -32,6 +33,7 @@ public class JuniorMenu extends BaseMenu {
 
     private final ContactDAO contactDAO;
     private final UserDAO userDAO;
+    private final UndoManager undoManager;
 
     /**
      * Constructor for JuniorMenu.
@@ -42,6 +44,7 @@ public class JuniorMenu extends BaseMenu {
         super(user);
         this.contactDAO = new ContactDAO();
         this.userDAO = new UserDAO();
+        this.undoManager = new UndoManager(contactDAO);
     }
 
     @Override
@@ -51,7 +54,8 @@ public class JuniorMenu extends BaseMenu {
         System.out.println(ColorUtils.juniorMenuOption("3. Search by multiple fields"));
         System.out.println(ColorUtils.juniorMenuOption("4. Sort contacts"));
         System.out.println(ColorUtils.juniorMenuOption("5. Update contact"));
-        System.out.println(ColorUtils.juniorMenuOption("6. Change password"));
+        System.out.println(ColorUtils.juniorMenuOption("6. Undo last operation"));
+        System.out.println(ColorUtils.juniorMenuOption("7. Change password"));
         System.out.println(ColorUtils.juniorMenuOption("0. Logout"));
     }
 
@@ -74,6 +78,9 @@ public class JuniorMenu extends BaseMenu {
                 updateContact();
                 break;
             case 6:
+                undoLastOperation();
+                break;
+            case 7:
                 changePassword();
                 break;
             default:
@@ -332,6 +339,9 @@ public class JuniorMenu extends BaseMenu {
             return;
         }
 
+        // Record the old state for undo before updating
+        undoManager.recordUpdate(contact);
+
         DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
         System.out.println("\n" + ColorUtils.header("Current Contact Information:"));
@@ -538,6 +548,52 @@ public class JuniorMenu extends BaseMenu {
             System.out.println("\n" + ColorUtils.error("Failed to update contact."));
         }
 
+        System.out.println(ColorUtils.juniorPrompt("Press Enter to continue..."));
+        waitForEnter();
+    }
+
+    /**
+     * Undoes the last update operation.
+     */
+    private void undoLastOperation() {
+        System.out.println("\n" + ColorUtils.header("--- Undo Last Operation ---"));
+        System.out.println(ColorUtils.header("======================================="));
+
+        if (!undoManager.canUndo()) {
+            System.out.println(ColorUtils.warning("No operations available to undo."));
+            System.out.println(ColorUtils.juniorPrompt("Press Enter to continue..."));
+            waitForEnter();
+            return;
+        }
+
+        // Confirmation prompt
+        String confirm;
+        while (true) {
+            System.out.print(ColorUtils.juniorPrompt("Are you sure you want to undo the last operation? (y/n): "));
+            confirm = scanner.nextLine().trim().toLowerCase();
+            
+            if (confirm.equals("y") || confirm.equals("n")) {
+                break;
+            }
+            
+            System.out.println(ColorUtils.error("Invalid choice. Please enter 'y' or 'n' only."));
+        }
+
+        if (!confirm.equals("y")) {
+            System.out.println(ColorUtils.info("Undo cancelled."));
+            System.out.println(ColorUtils.juniorPrompt("Press Enter to continue..."));
+            waitForEnter();
+            return;
+        }
+
+        System.out.println(ColorUtils.info("Undoing the last operation..."));
+        
+        if (undoManager.undo()) {
+            System.out.println(ColorUtils.success("Operation undone successfully!"));
+        } else {
+            System.out.println(ColorUtils.error("Failed to undo the last operation."));
+        }
+        
         System.out.println(ColorUtils.juniorPrompt("Press Enter to continue..."));
         waitForEnter();
     }

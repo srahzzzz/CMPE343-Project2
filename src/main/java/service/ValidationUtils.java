@@ -1,12 +1,24 @@
 package service;
 
 import java.time.LocalDate;
+import java.util.regex.Pattern;
 
 /**
  * Simple validation helpers for user input (phone numbers, emails, names, etc.).
  * @author sarah nauman
  */
 public final class ValidationUtils {
+
+    // Pattern to match letters (including Turkish characters), spaces, and hyphens
+    // Uses Unicode letter category and explicitly includes Turkish characters
+    private static final Pattern NAME_PATTERN = Pattern.compile(
+        "^[\\p{L}\\s-]+$", Pattern.UNICODE_CASE | Pattern.CANON_EQ
+    );
+    
+    // Pattern for nickname: letters, digits, spaces, hyphens, underscores
+    private static final Pattern NICKNAME_PATTERN = Pattern.compile(
+        "^[\\p{L}\\p{N}\\s_-]+$", Pattern.UNICODE_CASE | Pattern.CANON_EQ
+    );
 
     private ValidationUtils() {
         // Utility class
@@ -71,8 +83,11 @@ public final class ValidationUtils {
     /**
      * Validates a personal name (first/middle/last).
      * - Non-null, non-empty
-     * - Only letters (including Turkish characters like İ, ı, ş, ğ, ü, ö, ç), spaces, and hyphens are allowed
+     * - Only letters (including Turkish characters like İ, ı, ş, ğ, ü, ö, ç, Ç), spaces, and hyphens are allowed
      * - Apostrophes/single quotes are NOT supported
+     *
+     * Uses Unicode-aware validation to properly handle Turkish and other international characters.
+     * Validates using code points for maximum compatibility with encoding issues.
      *
      * @param name the name string to validate
      * @return true if valid, false otherwise
@@ -85,12 +100,25 @@ public final class ValidationUtils {
         if (trimmed.isEmpty()) {
             return false;
         }
-        for (int i = 0; i < trimmed.length(); i++) {
-            char c = trimmed.charAt(i);
-            if (!(Character.isLetter(c) || c == ' ' || c == '-')) {
+        
+        // Additional check: ensure no apostrophes/single quotes (straight or curly)
+        if (trimmed.contains("'") || trimmed.contains("'") || trimmed.contains("'")) {
+            return false;
+        }
+        
+        // Validate using code points - this is the most robust method
+        // It handles multi-byte characters correctly even if encoding is problematic
+        int codePointCount = trimmed.codePointCount(0, trimmed.length());
+        for (int i = 0; i < codePointCount; i++) {
+            int codePoint = trimmed.codePointAt(trimmed.offsetByCodePoints(0, i));
+            
+            // Check if it's a letter (Unicode letter category), space, or hyphen
+            // Character.isLetter() works for all Unicode letters including Turkish characters
+            if (!(Character.isLetter(codePoint) || codePoint == ' ' || codePoint == '-')) {
                 return false;
             }
         }
+        
         return true;
     }
 
@@ -98,6 +126,9 @@ public final class ValidationUtils {
      * Validates a nickname.
      * - Non-null, non-empty
      * - Letters (including Turkish characters), digits, spaces, '-' and '_' are allowed
+     *
+     * Uses Unicode-aware validation to properly handle Turkish and other international characters.
+     * Validates using code points to handle multi-byte characters correctly.
      *
      * @param nickname nickname string to validate
      * @return true if valid, false otherwise
@@ -110,12 +141,18 @@ public final class ValidationUtils {
         if (trimmed.isEmpty()) {
             return false;
         }
-        for (int i = 0; i < trimmed.length(); i++) {
-            char c = trimmed.charAt(i);
-            if (!(Character.isLetterOrDigit(c) || c == ' ' || c == '-' || c == '_')) {
+        
+        // Validate using code points to properly handle all Unicode characters including Turkish
+        int codePointCount = trimmed.codePointCount(0, trimmed.length());
+        for (int i = 0; i < codePointCount; i++) {
+            int codePoint = trimmed.codePointAt(trimmed.offsetByCodePoints(0, i));
+            
+            // Check if it's a letter, digit, space, hyphen, or underscore
+            if (!(Character.isLetterOrDigit(codePoint) || codePoint == ' ' || codePoint == '-' || codePoint == '_')) {
                 return false;
             }
         }
+        
         return true;
     }
 

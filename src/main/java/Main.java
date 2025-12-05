@@ -1,5 +1,8 @@
 import util.ColorUtils;
 
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+
 /**
  * <p>This class:
  * 1. Displays ASCII art animation on startup,
@@ -4349,6 +4352,44 @@ public class Main {
                 """;
     }
 
+    /**
+     * Configures UTF-8 encoding for console I/O to properly handle Turkish characters.
+     * This is critical on Windows where the default console encoding may not be UTF-8.
+     */
+    private static void configureUTF8Encoding() {
+        try {
+            // Set system property for file encoding
+            System.setProperty("file.encoding", "UTF-8");
+            
+            // Force Java to use UTF-8 for standard streams
+            try {
+                java.lang.reflect.Field charsetField = Charset.class.getDeclaredField("defaultCharset");
+                charsetField.setAccessible(true);
+                charsetField.set(null, StandardCharsets.UTF_8);
+            } catch (Exception e) {
+                // Reflection may fail in some environments, continue anyway
+            }
+            
+            // On Windows, try to set console code page to UTF-8 (65001)
+            if (System.getProperty("os.name").toLowerCase().contains("win")) {
+                try {
+                    // Use chcp command to set console code page to UTF-8
+                    // Redirect output to avoid cluttering console
+                    ProcessBuilder pb = new ProcessBuilder("cmd", "/c", "chcp", "65001");
+                    pb.redirectOutput(ProcessBuilder.Redirect.DISCARD);
+                    pb.redirectError(ProcessBuilder.Redirect.DISCARD);
+                    Process process = pb.start();
+                    process.waitFor();
+                } catch (Exception e) {
+                    // If chcp fails, continue - the Scanner UTF-8 configuration should still work
+                }
+            }
+        } catch (Exception e) {
+            // If configuration fails, log but don't crash
+            System.err.println("Warning: Could not fully configure UTF-8 encoding: " + e.getMessage());
+        }
+    }
+
     // Clear console between frames
     static void clearConsole() {
         try {
@@ -4366,6 +4407,9 @@ public class Main {
     }
 
     public static void main(String[] args) throws InterruptedException {
+        // Configure UTF-8 encoding for console I/O (critical for Turkish characters)
+        configureUTF8Encoding();
+        
         // Enable ANSI support
         try {
             if (System.getProperty("os.name").toLowerCase().contains("win")) {

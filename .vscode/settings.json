@@ -1,0 +1,11 @@
+{
+    // Set file encoding to UTF-8
+    "files.encoding": "utf8",
+    "files.autoGuessEncoding": true,
+    // Java encoding settings
+    "java.compile.nullAnalysis.mode": "automatic",
+    "java.configuration.updateBuildConfiguration": "automatic",
+    // Use Windows Terminal for better UTF-8 support
+    "terminal.external.windowsExec": "wt.exe"
+}
+

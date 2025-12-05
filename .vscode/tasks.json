@@ -1,0 +1,58 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Run Application with UTF-8",
+            "type": "shell",
+            "command": "mvn",
+            "args": [
+                "exec:java",
+                "-Dexec.mainClass=Main",
+                "-Dfile.encoding=UTF-8"
+            ],
+            "options": {
+                "env": {
+                    "JAVA_TOOL_OPTIONS": "-Dfile.encoding=UTF-8"
+                }
+            },
+            "problemMatcher": [],
+            "presentation": {
+                "reveal": "always",
+                "panel": "new"
+            },
+            "group": {
+                "kind": "build",
+                "isDefault": false
+            },
+            "runOptions": {
+                "runOn": "default"
+            }
+        },
+        {
+            "label": "Set UTF-8 and Run",
+            "type": "shell",
+            "command": "powershell.exe",
+            "args": [
+                "-Command",
+                "chcp 65001 | Out-Null; [Console]::OutputEncoding = [System.Text.Encoding]::UTF8; $OutputEncoding = [System.Text.Encoding]::UTF8; mvn exec:java \"-Dexec.mainClass=Main\" \"-Dfile.encoding=UTF-8\""
+            ],
+            "problemMatcher": [],
+            "presentation": {
+                "reveal": "always",
+                "panel": "new"
+            },
+            "group": "build"
+        },
+        {
+            "label": "Rebuild Project",
+            "type": "shell",
+            "command": "mvn clean compile",
+            "problemMatcher": [],
+            "presentation": {
+                "reveal": "always"
+            },
+            "group": "build"
+        }
+    ]
+}
+

@@ -8,6 +8,7 @@ import runninghorse.HorseFrames;
 import runninghorse.RunningHorseAnimator;
 import util.ColorUtils;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Scanner;
 
@@ -23,7 +24,8 @@ import java.util.Scanner;
 public class AuthService {
 
     private final UserDAO userDAO = new UserDAO();
-    private final Scanner scanner = new Scanner(System.in);
+    // Use UTF-8 encoding for Scanner to support Turkish characters (â, ç, ğ, İ, î, ö, ş, ü, û)
+    private final Scanner scanner = new Scanner(System.in, StandardCharsets.UTF_8);
 
     /**
      * Starts the login loop and launches appropriate menu based on role.

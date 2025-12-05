@@ -4366,15 +4366,20 @@ public class Main {
     }
 
     public static void main(String[] args) throws InterruptedException {
-        // Enable ANSI support
+        // Set UTF-8 encoding for console output and input to support Turkish characters
         try {
+            System.setOut(new java.io.PrintStream(System.out, true, java.nio.charset.StandardCharsets.UTF_8));
+            System.setErr(new java.io.PrintStream(System.err, true, java.nio.charset.StandardCharsets.UTF_8));
+            
             if (System.getProperty("os.name").toLowerCase().contains("win")) {
+                // Set Windows console code page to UTF-8 (65001)
+                new ProcessBuilder("cmd", "/c", "chcp", "65001").inheritIO().start().waitFor();
                 // Enable ANSI escape sequences
                 ProcessBuilder pb = new ProcessBuilder("cmd", "/c", "echo", "");
                 pb.start();
             }
         } catch (Exception e) {
-            // Ignore if ANSI enabling fails
+            // Ignore if encoding setup fails - continue anyway
         }
 
         int delayMs = 40;

@@ -5,6 +5,7 @@ import runninghorse.HorseFrames;
 import runninghorse.RunningHorseAnimator;
 import util.ColorUtils;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Scanner;
 
@@ -24,7 +25,8 @@ public abstract class BaseMenu {
      */
     public BaseMenu(User user) {
         this.currentUser = user;
-        this.scanner = new Scanner(System.in);
+        // Use UTF-8 encoding for Scanner to support Turkish characters (â, ç, ğ, İ, î, ö, ş, ü, û)
+        this.scanner = new Scanner(System.in, StandardCharsets.UTF_8);
     }
 
     /**

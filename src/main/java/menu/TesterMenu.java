@@ -395,54 +395,104 @@ public class TesterMenu extends BaseMenu {
     /**
      * Helper method to display contacts in a formatted table.
      * Shows all contact information including middle name, nickname, secondary phone, and LinkedIn URL.
+     * Creates a table with dynamic column widths based on content, enabling horizontal scrolling without truncation.
      *
      * @param contacts the list of contacts to display
      */
     private void displayContactsTable(List<Contact> contacts) {
-        // Display header with all fields
-        System.out.printf(ColorUtils.header("%-6s %-15s %-15s %-15s %-15s %-15s %-15s %-25s %-25s %-12s%n"),
-            "ID", "First Name", "Middle Name", "Last Name", "Nickname", 
-            "Phone 1", "Phone 2", "Email", "LinkedIn", "Birth Date");
-        System.out.println(ColorUtils.colorize("--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------", ColorUtils.CYAN));
-        
+        if (contacts.isEmpty()) {
+            return;
+        }
+
         DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         
-        for (Contact contact : contacts) {
-            String firstName = contact.getFirstName() != null ? contact.getFirstName() : "";
-            String middleName = contact.getMiddleName() != null ? contact.getMiddleName() : "";
-            String lastName = contact.getLastName() != null ? contact.getLastName() : "";
-            String nickname = contact.getNickname() != null ? contact.getNickname() : "";
-            String phonePrimary = contact.getPhonePrimary() != null ? contact.getPhonePrimary() : "";
-            String phoneSecondary = contact.getPhoneSecondary() != null ? contact.getPhoneSecondary() : "";
-            String email = contact.getEmail() != null ? contact.getEmail() : "";
-            String linkedinUrl = contact.getLinkedinUrl() != null ? contact.getLinkedinUrl() : "";
+        // Prepare data and calculate column widths
+        String[] headers = {"ID", "First Name", "Middle Name", "Last Name", "Nickname", 
+                           "Phone 1", "Phone 2", "Email", "LinkedIn", "Birth Date"};
+        
+        String[][] rows = new String[contacts.size()][10];
+        int[] columnWidths = new int[10];
+        
+        // Initialize column widths with header lengths
+        for (int i = 0; i < headers.length; i++) {
+            columnWidths[i] = headers[i].length();
+        }
+        
+        // Process contacts and calculate max width for each column
+        for (int i = 0; i < contacts.size(); i++) {
+            Contact contact = contacts.get(i);
+            
+            String id = String.valueOf(contact.getContactId());
+            String firstName = contact.getFirstName() != null ? contact.getFirstName() : "N/A";
+            String middleName = contact.getMiddleName() != null ? contact.getMiddleName() : "N/A";
+            String lastName = contact.getLastName() != null ? contact.getLastName() : "N/A";
+            String nickname = contact.getNickname() != null ? contact.getNickname() : "N/A";
+            String phonePrimary = contact.getPhonePrimary() != null ? contact.getPhonePrimary() : "N/A";
+            String phoneSecondary = contact.getPhoneSecondary() != null ? contact.getPhoneSecondary() : "N/A";
+            String email = contact.getEmail() != null ? contact.getEmail() : "N/A";
+            String linkedinUrl = contact.getLinkedinUrl() != null ? contact.getLinkedinUrl() : "N/A";
             String birthDate = contact.getBirthDate() != null ? 
                 contact.getBirthDate().format(dateFormatter) : "N/A";
             
-            // Truncate long strings for display to fit column widths
-            if (firstName.length() > 13) firstName = firstName.substring(0, 10) + "...";
-            if (middleName.length() > 13) middleName = middleName.substring(0, 10) + "...";
-            if (lastName.length() > 13) lastName = lastName.substring(0, 10) + "...";
-            if (nickname.length() > 13) nickname = nickname.substring(0, 10) + "...";
-            if (phonePrimary.length() > 13) phonePrimary = phonePrimary.substring(0, 10) + "...";
-            if (phoneSecondary.length() > 13) phoneSecondary = phoneSecondary.substring(0, 10) + "...";
-            if (email.length() > 23) email = email.substring(0, 20) + "...";
-            if (linkedinUrl.length() > 23) linkedinUrl = linkedinUrl.substring(0, 20) + "...";
+            rows[i][0] = id;
+            rows[i][1] = firstName;
+            rows[i][2] = middleName;
+            rows[i][3] = lastName;
+            rows[i][4] = nickname;
+            rows[i][5] = phonePrimary;
+            rows[i][6] = phoneSecondary;
+            rows[i][7] = email;
+            rows[i][8] = linkedinUrl;
+            rows[i][9] = birthDate;
             
-            System.out.printf("%-6d %-15s %-15s %-15s %-15s %-15s %-15s %-25s %-25s %-12s%n",
-                contact.getContactId(),
-                firstName,
-                middleName.isEmpty() ? "N/A" : middleName,
-                lastName,
-                nickname.isEmpty() ? "N/A" : nickname,
-                phonePrimary.isEmpty() ? "N/A" : phonePrimary,
-                phoneSecondary.isEmpty() ? "N/A" : phoneSecondary,
-                email.isEmpty() ? "N/A" : email,
-                linkedinUrl.isEmpty() ? "N/A" : linkedinUrl,
-                birthDate);
+            // Update column widths
+            columnWidths[0] = Math.max(columnWidths[0], id.length());
+            columnWidths[1] = Math.max(columnWidths[1], firstName.length());
+            columnWidths[2] = Math.max(columnWidths[2], middleName.length());
+            columnWidths[3] = Math.max(columnWidths[3], lastName.length());
+            columnWidths[4] = Math.max(columnWidths[4], nickname.length());
+            columnWidths[5] = Math.max(columnWidths[5], phonePrimary.length());
+            columnWidths[6] = Math.max(columnWidths[6], phoneSecondary.length());
+            columnWidths[7] = Math.max(columnWidths[7], email.length());
+            columnWidths[8] = Math.max(columnWidths[8], linkedinUrl.length());
+            columnWidths[9] = Math.max(columnWidths[9], birthDate.length());
         }
         
-        System.out.println(ColorUtils.colorize("--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------", ColorUtils.CYAN));
+        // Build separator line with minimal spacing
+        StringBuilder separator = new StringBuilder();
+        for (int i = 0; i < columnWidths.length; i++) {
+            separator.append("+");
+            for (int j = 0; j < columnWidths[i] + 1; j++) {
+                separator.append("-");
+            }
+        }
+        separator.append("+");
+        
+        // Display header with minimal spacing
+        StringBuilder headerLine = new StringBuilder();
+        for (int i = 0; i < headers.length; i++) {
+            headerLine.append("|");
+            headerLine.append(String.format("%-" + columnWidths[i] + "s", headers[i]));
+        }
+        headerLine.append("|");
+        
+        System.out.println(ColorUtils.colorize(separator.toString(), ColorUtils.CYAN));
+        System.out.println(ColorUtils.header(headerLine.toString()));
+        System.out.println(ColorUtils.colorize(separator.toString(), ColorUtils.CYAN));
+        
+        // Display rows with minimal spacing
+        for (String[] row : rows) {
+            StringBuilder rowLine = new StringBuilder();
+            for (int i = 0; i < row.length; i++) {
+                rowLine.append("|");
+                rowLine.append(String.format("%-" + columnWidths[i] + "s", row[i]));
+            }
+            rowLine.append("|");
+            System.out.println(rowLine.toString());
+        }
+        
+        System.out.println(ColorUtils.colorize(separator.toString(), ColorUtils.CYAN));
+        System.out.println(ColorUtils.info("(Table scrolls horizontally if content is wider than screen)"));
     }
 }
 

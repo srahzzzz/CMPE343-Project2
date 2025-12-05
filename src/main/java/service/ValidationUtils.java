@@ -71,7 +71,7 @@ public final class ValidationUtils {
     /**
      * Validates a personal name (first/middle/last).
      * - Non-null, non-empty
-     * - Only letters, spaces, apostrophes and hyphens are allowed
+     * - Only letters (including Turkish characters like İ, ı, ş, ğ, ü, ö, ç), spaces, apostrophes and hyphens are allowed
      *
      * @param name the name string to validate
      * @return true if valid, false otherwise
@@ -96,7 +96,7 @@ public final class ValidationUtils {
     /**
      * Validates a nickname.
      * - Non-null, non-empty
-     * - Letters, digits, spaces, '-' and '_' are allowed
+     * - Letters (including Turkish characters), digits, spaces, '-' and '_' are allowed
      *
      * @param nickname nickname string to validate
      * @return true if valid, false otherwise

@@ -71,7 +71,8 @@ public final class ValidationUtils {
     /**
      * Validates a personal name (first/middle/last).
      * - Non-null, non-empty
-     * - Only letters (including Turkish characters like İ, ı, ş, ğ, ü, ö, ç), spaces, apostrophes and hyphens are allowed
+     * - Only letters (including Turkish characters like İ, ı, ş, ğ, ü, ö, ç), spaces, and hyphens are allowed
+     * - Apostrophes/single quotes are NOT supported
      *
      * @param name the name string to validate
      * @return true if valid, false otherwise
@@ -86,7 +87,7 @@ public final class ValidationUtils {
         }
         for (int i = 0; i < trimmed.length(); i++) {
             char c = trimmed.charAt(i);
-            if (!(Character.isLetter(c) || c == ' ' || c == '-' || c == '\'')) {
+            if (!(Character.isLetter(c) || c == ' ' || c == '-')) {
                 return false;
             }
         }

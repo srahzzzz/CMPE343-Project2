@@ -299,12 +299,16 @@ public class TesterMenu extends BaseMenu {
         System.out.print(ColorUtils.testerPrompt("Enter your choice: "));
         
         String orderInput = scanner.nextLine().trim();
-        Integer orderChoice = BaseMenu.safeParseInt(orderInput);
         
-        boolean ascending = true;
-        if (orderChoice != null && orderChoice == 2) {
-            ascending = false;
+        // Strict validation: only accept exactly "1" or "2"
+        if (!orderInput.equals("1") && !orderInput.equals("2")) {
+            System.out.println(ColorUtils.error("Invalid choice. Please enter 1 or 2 only."));
+            System.out.println(ColorUtils.testerPrompt("Press Enter to continue..."));
+            waitForEnter();
+            return;
         }
+        
+        boolean ascending = orderInput.equals("1");
         
         List<Contact> contacts = contactDAO.findAllSorted(field, ascending);
         
@@ -458,7 +462,7 @@ public class TesterMenu extends BaseMenu {
             columnWidths[9] = Math.max(columnWidths[9], birthDate.length());
         }
         
-        // Build separator line with minimal spacing
+        // Build separator line - match column widths exactly with no extra spacing
         StringBuilder separator = new StringBuilder();
         for (int i = 0; i < columnWidths.length; i++) {
             separator.append("+");
@@ -468,7 +472,7 @@ public class TesterMenu extends BaseMenu {
         }
         separator.append("+");
         
-        // Display header with minimal spacing
+        // Display header with no spacing - columns close together
         StringBuilder headerLine = new StringBuilder();
         for (int i = 0; i < headers.length; i++) {
             headerLine.append("|");
@@ -480,7 +484,7 @@ public class TesterMenu extends BaseMenu {
         System.out.println(ColorUtils.header(headerLine.toString()));
         System.out.println(ColorUtils.colorize(separator.toString(), ColorUtils.CYAN));
         
-        // Display rows with minimal spacing
+        // Display rows with no spacing - columns close together, properly aligned
         for (String[] row : rows) {
             StringBuilder rowLine = new StringBuilder();
             for (int i = 0; i < row.length; i++) {
@@ -492,7 +496,6 @@ public class TesterMenu extends BaseMenu {
         }
         
         System.out.println(ColorUtils.colorize(separator.toString(), ColorUtils.CYAN));
-        System.out.println(ColorUtils.info("(Table scrolls horizontally if content is wider than screen)"));
     }
 }
 

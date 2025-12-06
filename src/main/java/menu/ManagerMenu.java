@@ -48,9 +48,10 @@ public class ManagerMenu extends BaseMenu {
         System.out.println(ColorUtils.managerMenuOption("2. List all users"));
         System.out.println(ColorUtils.managerMenuOption("3. Update user"));
         System.out.println(ColorUtils.managerMenuOption("4. Add new user"));
-        System.out.println(ColorUtils.managerMenuOption("5. Delete user"));
-        System.out.println(ColorUtils.managerMenuOption("6. Undo last operation"));
-        System.out.println(ColorUtils.managerMenuOption("7. Change password"));
+        System.out.println(ColorUtils.managerMenuOption("5. Fire user"));
+        System.out.println(ColorUtils.managerMenuOption("6. Delete user"));
+        System.out.println(ColorUtils.managerMenuOption("7. Undo last operation"));
+        System.out.println(ColorUtils.managerMenuOption("8. Change password"));
         System.out.println(ColorUtils.managerMenuOption("0. Logout"));
     }
 
@@ -70,12 +71,15 @@ public class ManagerMenu extends BaseMenu {
                 addUser();
                 break;
             case 5:
-                deleteUser();
+                fireUser();
                 break;
             case 6:
-                handleUndoOperation(undoService);
+                deleteUser();
                 break;
             case 7:
+                handleUndoOperation(undoService);
+                break;
+            case 8:
                 changePassword();
                 break;
             default:
@@ -160,20 +164,25 @@ public class ManagerMenu extends BaseMenu {
         if (users.isEmpty()) {
             System.out.println(ColorUtils.warning("No users found in the system."));
         } else {
-            System.out.printf(ColorUtils.header("%-8s %-15s %-20s %-20s %-15s%n"), 
-                "ID", "Username", "Name", "Surname", "Role");
-            System.out.println(ColorUtils.colorize("-------------------------------------------------------------------", ColorUtils.CYAN));
+            System.out.printf(ColorUtils.header("%-8s %-15s %-20s %-20s %-15s %-12s%n"), 
+                "ID", "Username", "Name", "Surname", "Role", "Status");
+            System.out.println(ColorUtils.colorize("---------------------------------------------------------------------------------------", ColorUtils.CYAN));
             
             for (User user : users) {
-                System.out.printf("%-8d %-15s %-20s %-20s %-15s%n",
+                String status = user.getEmploymentStatus();
+                if (status == null || status.isEmpty()) {
+                    status = "Employed"; // Default for backward compatibility
+                }
+                System.out.printf("%-8d %-15s %-20s %-20s %-15s %-12s%n",
                     user.getUserId(),
                     user.getUsername(),
                     user.getName(),
                     user.getSurname(),
-                    user.getRole());
+                    user.getRole(),
+                    status);
             }
             
-            System.out.println(ColorUtils.colorize("-------------------------------------------------------------------", ColorUtils.CYAN));
+            System.out.println(ColorUtils.colorize("---------------------------------------------------------------------------------------", ColorUtils.CYAN));
             System.out.println(ColorUtils.info("Total users: " + users.size()));
         }
         
@@ -219,6 +228,11 @@ public class ManagerMenu extends BaseMenu {
         System.out.println(ColorUtils.info("Name: " + user.getName()));
         System.out.println(ColorUtils.info("Surname: " + user.getSurname()));
         System.out.println(ColorUtils.info("Role: " + user.getRole()));
+        String status = user.getEmploymentStatus();
+        if (status == null || status.isEmpty()) {
+            status = "Employed";
+        }
+        System.out.println(ColorUtils.info("Status: " + status));
         System.out.println("\n" + ColorUtils.info("Enter new values (press Enter to keep current value):"));
         
         // Update username
@@ -384,6 +398,9 @@ public class ManagerMenu extends BaseMenu {
             newUser.setRole("Tester");
         }
         
+        // Set employment status to 'Employed' for new users
+        newUser.setEmploymentStatus("Employed");
+        
         // Create user
         if (userDAO.create(newUser)) {
             System.out.println("\n" + ColorUtils.success("User created successfully!"));
@@ -392,6 +409,86 @@ public class ManagerMenu extends BaseMenu {
             undoService.recordUserAdd(newUser.getUserId());
         } else {
             System.out.println("\n" + ColorUtils.error("Failed to create user. Username may already exist."));
+        }
+        
+        System.out.println(ColorUtils.managerPrompt("Press Enter to continue..."));
+        waitForEnter();
+    }
+
+    /**
+     * Fires a user by updating their employment_status to 'Fired'.
+     * Prompts for user ID and confirms before firing.
+     */
+    private void fireUser() {
+        System.out.println("\n" + ColorUtils.header("--- Fire User ---"));
+        System.out.println(ColorUtils.header("======================================="));
+        
+        System.out.print(ColorUtils.managerPrompt("Enter User ID to fire: "));
+        String idInput = scanner.nextLine().trim();
+        Integer userId = BaseMenu.safeParseInt(idInput);
+        
+        if (userId == null) {
+            System.out.println(ColorUtils.error("Invalid user ID. Please enter a valid number."));
+            System.out.println(ColorUtils.managerPrompt("Press Enter to continue..."));
+            waitForEnter();
+            return;
+        }
+        
+        // Check if user exists
+        User user = userDAO.findById(userId);
+        if (user == null) {
+            System.out.println(ColorUtils.error("User with ID " + userId + " not found."));
+            System.out.println(ColorUtils.managerPrompt("Press Enter to continue..."));
+            waitForEnter();
+            return;
+        }
+        
+        // Prevent firing yourself
+        if (user.getUserId() == currentUser.getUserId()) {
+            System.out.println(ColorUtils.error("You cannot fire your own account!"));
+            System.out.println(ColorUtils.managerPrompt("Press Enter to continue..."));
+            waitForEnter();
+            return;
+        }
+        
+        // Check if already fired
+        String currentStatus = user.getEmploymentStatus();
+        if (currentStatus != null && currentStatus.equals("Fired")) {
+            System.out.println(ColorUtils.warning("User is already fired."));
+            System.out.println(ColorUtils.managerPrompt("Press Enter to continue..."));
+            waitForEnter();
+            return;
+        }
+        
+        // Display user info and confirm
+        System.out.println("\n" + ColorUtils.header("User to be fired:"));
+        System.out.println(ColorUtils.info("ID: " + user.getUserId()));
+        System.out.println(ColorUtils.info("Username: " + user.getUsername()));
+        System.out.println(ColorUtils.info("Name: " + user.getName() + " " + user.getSurname()));
+        System.out.println(ColorUtils.info("Role: " + user.getRole()));
+        System.out.println(ColorUtils.info("Current Status: " + (currentStatus != null ? currentStatus : "Employed")));
+        
+        // Strict y/n validation
+        String confirm;
+        while (true) {
+            System.out.print("\n" + ColorUtils.managerPrompt("Are you sure you want to fire this user? (y/n): "));
+            confirm = scanner.nextLine().trim().toLowerCase();
+            
+            if (confirm.equals("y") || confirm.equals("n")) {
+                break;
+            }
+            
+            System.out.println(ColorUtils.error("Invalid choice. Please enter 'y' or 'n'."));
+        }
+        
+        if (confirm.equals("y")) {
+            if (userDAO.fireUser(userId)) {
+                System.out.println(ColorUtils.success("User fired successfully!"));
+            } else {
+                System.out.println(ColorUtils.error("Failed to fire user."));
+            }
+        } else {
+            System.out.println(ColorUtils.info("Operation cancelled."));
         }
         
         System.out.println(ColorUtils.managerPrompt("Press Enter to continue..."));
@@ -443,6 +540,11 @@ public class ManagerMenu extends BaseMenu {
         System.out.println(ColorUtils.info("Username: " + user.getUsername()));
         System.out.println(ColorUtils.info("Name: " + user.getName() + " " + user.getSurname()));
         System.out.println(ColorUtils.info("Role: " + user.getRole()));
+        String status = user.getEmploymentStatus();
+        if (status == null || status.isEmpty()) {
+            status = "Employed";
+        }
+        System.out.println(ColorUtils.info("Status: " + status));
 
         // Strict y/n validation
         String confirm;

@@ -14,6 +14,7 @@ public class User {
     private String name;
     private String surname;
     private String role;
+    private String employmentStatus;  // 'Employed' or 'Fired'
 
     // Getters and Setters
     /** @return the unique user identifier */
@@ -45,4 +46,9 @@ public class User {
     public String getRole() { return role; }
     /** @param r the user's role (Tester, Junior, Senior, Manager) */
     public void setRole(String r) { this.role = r; }
+    
+    /** @return the employment status (Employed or Fired) */
+    public String getEmploymentStatus() { return employmentStatus; }
+    /** @param status the employment status (Employed or Fired) */
+    public void setEmploymentStatus(String status) { this.employmentStatus = status; }
 }

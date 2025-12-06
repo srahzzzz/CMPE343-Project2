@@ -37,14 +37,7 @@ public class UserDAO {
             ResultSet rs = ps.executeQuery();
 
             if (rs.next()) {
-                User u = new User();
-                u.setUserId(rs.getInt("user_id"));
-                u.setUsername(rs.getString("username"));
-                u.setPasswordHash(rs.getString("password_hash"));
-                u.setName(rs.getString("name"));
-                u.setSurname(rs.getString("surname"));
-                u.setRole(rs.getString("role"));
-                return u;
+                return mapResultSetToUser(rs);
             }
 
         } catch (SQLException e) {
@@ -194,7 +187,7 @@ public class UserDAO {
         // Reset AUTO_INCREMENT to ensure sequential IDs
         resetAutoIncrement();
         
-        String query = "INSERT INTO users (username, password_hash, name, surname, role) VALUES (?, ?, ?, ?, ?)";
+        String query = "INSERT INTO users (username, password_hash, name, surname, role, employment_status) VALUES (?, ?, ?, ?, ?, ?)";
 
         try {
             PreparedStatement ps = DBConnection.getConnection().prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
@@ -203,6 +196,12 @@ public class UserDAO {
             ps.setString(3, user.getName());
             ps.setString(4, user.getSurname());
             ps.setString(5, user.getRole());
+            // Set employment_status - default to 'Employed' if not set
+            String employmentStatus = user.getEmploymentStatus();
+            if (employmentStatus == null || employmentStatus.isEmpty()) {
+                employmentStatus = "Employed";
+            }
+            ps.setString(6, employmentStatus);
 
             int rowsAffected = ps.executeUpdate();
 
@@ -247,9 +246,9 @@ public class UserDAO {
         boolean updatePassword = user.getPasswordHash() != null && !user.getPasswordHash().trim().isEmpty();
 
         if (updatePassword) {
-            query = "UPDATE users SET username = ?, password_hash = ?, name = ?, surname = ?, role = ? WHERE user_id = ?";
+            query = "UPDATE users SET username = ?, password_hash = ?, name = ?, surname = ?, role = ?, employment_status = ? WHERE user_id = ?";
         } else {
-            query = "UPDATE users SET username = ?, name = ?, surname = ?, role = ? WHERE user_id = ?";
+            query = "UPDATE users SET username = ?, name = ?, surname = ?, role = ?, employment_status = ? WHERE user_id = ?";
         }
 
         try {
@@ -264,6 +263,18 @@ public class UserDAO {
             ps.setString(paramIndex++, user.getName());
             ps.setString(paramIndex++, user.getSurname());
             ps.setString(paramIndex++, user.getRole());
+            // Set employment_status - keep existing if not provided
+            String employmentStatus = user.getEmploymentStatus();
+            if (employmentStatus == null || employmentStatus.isEmpty()) {
+                // If not provided, get existing status from database
+                User existingUser = findById(user.getUserId());
+                if (existingUser != null) {
+                    employmentStatus = existingUser.getEmploymentStatus();
+                } else {
+                    employmentStatus = "Employed"; // Default
+                }
+            }
+            ps.setString(paramIndex++, employmentStatus);
             ps.setInt(paramIndex, user.getUserId());
 
             int rowsAffected = ps.executeUpdate();
@@ -325,6 +336,43 @@ public class UserDAO {
      * @throws SQLException if database access error occurs
      * @author sarah nauman
      */
+    /**
+     * Fires a user by updating their employment_status to 'Fired'.
+     * 
+     * @param userId the unique identifier of the user to fire
+     * @return true if user was fired successfully, false otherwise
+     */
+    public boolean fireUser(int userId) {
+        String query = "UPDATE users SET employment_status = 'Fired' WHERE user_id = ?";
+        
+        try {
+            PreparedStatement ps = DBConnection.getConnection().prepareStatement(query);
+            ps.setInt(1, userId);
+            
+            int rowsAffected = ps.executeUpdate();
+            return rowsAffected > 0;
+            
+        } catch (SQLException e) {
+            System.out.println("UserDAO Error (fireUser): " + e.getMessage());
+            System.out.println("SQL State: " + e.getSQLState());
+            System.out.println("Error Code: " + e.getErrorCode());
+            e.printStackTrace();
+            return false;
+        } catch (Exception e) {
+            System.out.println("UserDAO Unexpected Error (fireUser): " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    /**
+     * Helper method to map a ResultSet row to a User object.
+     *
+     * @param rs the ResultSet containing user data
+     * @return User object populated with data from ResultSet
+     * @throws SQLException if database access error occurs
+     * @author sarah nauman
+     */
     private User mapResultSetToUser(ResultSet rs) throws SQLException {
         User u = new User();
         u.setUserId(rs.getInt("user_id"));
@@ -333,6 +381,13 @@ public class UserDAO {
         u.setName(rs.getString("name"));
         u.setSurname(rs.getString("surname"));
         u.setRole(rs.getString("role"));
+        // Get employment_status - handle case where column might not exist (for backward compatibility)
+        try {
+            u.setEmploymentStatus(rs.getString("employment_status"));
+        } catch (SQLException e) {
+            // Column doesn't exist yet, default to 'Employed'
+            u.setEmploymentStatus("Employed");
+        }
         return u;
     }
 }

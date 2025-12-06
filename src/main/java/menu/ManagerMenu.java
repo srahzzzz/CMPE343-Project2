@@ -1,11 +1,13 @@
 package menu;
 
 import dao.ContactDAO;
+import dao.UndoOperationDAO;
 import dao.UserDAO;
 import model.User;
 import service.AuthService;
+import service.UndoService;
+import service.ValidationUtils;
 import util.ColorUtils;
-import util.UndoManager;
 
 import java.util.List;
 
@@ -26,7 +28,7 @@ public class ManagerMenu extends BaseMenu {
 
     private final UserDAO userDAO;
     private final ContactDAO contactDAO;
-    private final UndoManager undoManager;
+    private final UndoService undoService;
 
     /**
      * Constructor for ManagerMenu.
@@ -37,7 +39,7 @@ public class ManagerMenu extends BaseMenu {
         super(user);
         this.userDAO = new UserDAO();
         this.contactDAO = new ContactDAO();
-        this.undoManager = new UndoManager(userDAO);
+        this.undoService = new UndoService(new UndoOperationDAO(), contactDAO, userDAO);
     }
 
     @Override
@@ -71,7 +73,7 @@ public class ManagerMenu extends BaseMenu {
                 deleteUser();
                 break;
             case 6:
-                undoLastOperation();
+                handleUndoOperation(undoService);
                 break;
             case 7:
                 changePassword();
@@ -208,7 +210,7 @@ public class ManagerMenu extends BaseMenu {
         }
         
         // Record the old state for undo before updating
-        undoManager.recordUpdate(user);
+        undoService.recordUserUpdate(user);
         
         // Display current user info
         System.out.println("\n" + ColorUtils.header("Current User Information:"));
@@ -223,6 +225,12 @@ public class ManagerMenu extends BaseMenu {
         System.out.print(ColorUtils.managerPrompt("Username [" + user.getUsername() + "]: "));
         String username = scanner.nextLine().trim();
         if (!username.isEmpty()) {
+            if (!ValidationUtils.isValidNickname(username)) {
+                System.out.println(ColorUtils.error("Invalid username. Use ONLY letters (Turkish characters supported) and digits. NO spaces, hyphens, dashes, underscores, or ANY special characters allowed."));
+                System.out.println(ColorUtils.managerPrompt("Press Enter to continue..."));
+                waitForEnter();
+                return;
+            }
             user.setUsername(username);
         }
         
@@ -230,6 +238,12 @@ public class ManagerMenu extends BaseMenu {
         System.out.print(ColorUtils.managerPrompt("Name [" + user.getName() + "]: "));
         String name = scanner.nextLine().trim();
         if (!name.isEmpty()) {
+            if (!ValidationUtils.isValidName(name)) {
+                System.out.println(ColorUtils.error("Invalid name. Use ONLY letters (Turkish characters supported). NO spaces, hyphens, dashes, or ANY special characters allowed."));
+                System.out.println(ColorUtils.managerPrompt("Press Enter to continue..."));
+                waitForEnter();
+                return;
+            }
             user.setName(name);
         }
         
@@ -237,6 +251,12 @@ public class ManagerMenu extends BaseMenu {
         System.out.print(ColorUtils.managerPrompt("Surname [" + user.getSurname() + "]: "));
         String surname = scanner.nextLine().trim();
         if (!surname.isEmpty()) {
+            if (!ValidationUtils.isValidName(surname)) {
+                System.out.println(ColorUtils.error("Invalid surname. Use ONLY letters (Turkish characters supported). NO spaces, hyphens, dashes, or ANY special characters allowed."));
+                System.out.println(ColorUtils.managerPrompt("Press Enter to continue..."));
+                waitForEnter();
+                return;
+            }
             user.setSurname(surname);
         }
         
@@ -296,6 +316,12 @@ public class ManagerMenu extends BaseMenu {
             waitForEnter();
             return;
         }
+        if (!ValidationUtils.isValidNickname(username)) {
+            System.out.println(ColorUtils.error("Invalid username. Use ONLY letters (Turkish characters supported) and digits. NO spaces, hyphens, dashes, underscores, or ANY special characters allowed."));
+            System.out.println(ColorUtils.managerPrompt("Press Enter to continue..."));
+            waitForEnter();
+            return;
+        }
         newUser.setUsername(username);
         
         // Get password
@@ -319,6 +345,12 @@ public class ManagerMenu extends BaseMenu {
             waitForEnter();
             return;
         }
+        if (!ValidationUtils.isValidName(name)) {
+            System.out.println(ColorUtils.error("Invalid name. Use ONLY letters (Turkish characters supported). NO spaces, hyphens, dashes, or ANY special characters allowed."));
+            System.out.println(ColorUtils.managerPrompt("Press Enter to continue..."));
+            waitForEnter();
+            return;
+        }
         newUser.setName(name);
         
         // Get surname
@@ -326,6 +358,12 @@ public class ManagerMenu extends BaseMenu {
         String surname = scanner.nextLine().trim();
         if (surname.isEmpty()) {
             System.out.println(ColorUtils.error("Surname cannot be empty. User creation cancelled."));
+            System.out.println(ColorUtils.managerPrompt("Press Enter to continue..."));
+            waitForEnter();
+            return;
+        }
+        if (!ValidationUtils.isValidName(surname)) {
+            System.out.println(ColorUtils.error("Invalid surname. Use ONLY letters (Turkish characters supported). NO spaces, hyphens, dashes, or ANY special characters allowed."));
             System.out.println(ColorUtils.managerPrompt("Press Enter to continue..."));
             waitForEnter();
             return;
@@ -351,7 +389,7 @@ public class ManagerMenu extends BaseMenu {
             System.out.println("\n" + ColorUtils.success("User created successfully!"));
             System.out.println(ColorUtils.success("New User ID: " + newUser.getUserId()));
             // Record the add operation for undo
-            undoManager.recordUserAdd(newUser.getUserId());
+            undoService.recordUserAdd(newUser.getUserId());
         } else {
             System.out.println("\n" + ColorUtils.error("Failed to create user. Username may already exist."));
         }
@@ -397,7 +435,7 @@ public class ManagerMenu extends BaseMenu {
         }
         
         // Record delete operation before deletion
-        undoManager.recordDelete(user);
+        undoService.recordUserDelete(user);
         
         // Display user info and confirm
         System.out.println("\n" + ColorUtils.header("User to be deleted:"));
@@ -436,48 +474,6 @@ public class ManagerMenu extends BaseMenu {
     /**
      * Undoes the last add, update, or delete operation.
      */
-    private void undoLastOperation() {
-        System.out.println("\n" + ColorUtils.header("--- Undo Last Operation ---"));
-        System.out.println(ColorUtils.header("======================================="));
-
-        if (!undoManager.canUndo()) {
-            System.out.println(ColorUtils.warning("No operations available to undo."));
-            System.out.println(ColorUtils.managerPrompt("Press Enter to continue..."));
-            waitForEnter();
-            return;
-        }
-
-        // Confirmation prompt
-        String confirm;
-        while (true) {
-            System.out.print(ColorUtils.managerPrompt("Are you sure you want to undo the last operation? (y/n): "));
-            confirm = scanner.nextLine().trim().toLowerCase();
-            
-            if (confirm.equals("y") || confirm.equals("n")) {
-                break;
-            }
-            
-            System.out.println(ColorUtils.error("Invalid choice. Please enter 'y' or 'n' only."));
-        }
-
-        if (!confirm.equals("y")) {
-            System.out.println(ColorUtils.info("Undo cancelled."));
-            System.out.println(ColorUtils.managerPrompt("Press Enter to continue..."));
-            waitForEnter();
-            return;
-        }
-
-        System.out.println(ColorUtils.info("Undoing the last operation..."));
-        
-        if (undoManager.undo()) {
-            System.out.println(ColorUtils.success("Operation undone successfully!"));
-        } else {
-            System.out.println(ColorUtils.error("Failed to undo the last operation."));
-        }
-        
-        System.out.println(ColorUtils.managerPrompt("Press Enter to continue..."));
-        waitForEnter();
-    }
 
     /**
      * Changes the password for the currently logged-in user.

@@ -9,15 +9,15 @@ import java.util.regex.Pattern;
  */
 public final class ValidationUtils {
 
-    // Pattern to match letters (including Turkish characters), spaces, and hyphens
+    // Pattern to match ONLY letters (including Turkish characters) - NO spaces, hyphens, or special characters
     // Uses Unicode letter category and explicitly includes Turkish characters
     private static final Pattern NAME_PATTERN = Pattern.compile(
-        "^[\\p{L}\\s-]+$", Pattern.UNICODE_CASE | Pattern.CANON_EQ
+        "^[\\p{L}]+$", Pattern.UNICODE_CASE | Pattern.CANON_EQ
     );
     
-    // Pattern for nickname: letters, digits, spaces, hyphens, underscores
+    // Pattern for nickname: ONLY letters and digits - NO spaces, hyphens, underscores, or special characters
     private static final Pattern NICKNAME_PATTERN = Pattern.compile(
-        "^[\\p{L}\\p{N}\\s_-]+$", Pattern.UNICODE_CASE | Pattern.CANON_EQ
+        "^[\\p{L}\\p{N}]+$", Pattern.UNICODE_CASE | Pattern.CANON_EQ
     );
 
     private ValidationUtils() {
@@ -83,8 +83,8 @@ public final class ValidationUtils {
     /**
      * Validates a personal name (first/middle/last).
      * - Non-null, non-empty
-     * - Only letters (including Turkish characters like İ, ı, ş, ğ, ü, ö, ç, Ç), spaces, and hyphens are allowed
-     * - Apostrophes/single quotes are NOT supported
+     * - ONLY letters (including Turkish characters like İ, ı, ş, ğ, ü, ö, ç, Ç)
+     * - STRICTLY NO spaces, hyphens, dashes, apostrophes, or ANY special characters allowed
      *
      * Uses Unicode-aware validation to properly handle Turkish and other international characters.
      * Validates using code points for maximum compatibility with encoding issues.
@@ -101,20 +101,16 @@ public final class ValidationUtils {
             return false;
         }
         
-        // Additional check: ensure no apostrophes/single quotes (straight or curly)
-        if (trimmed.contains("'") || trimmed.contains("'") || trimmed.contains("'")) {
-            return false;
-        }
-        
+        // STRICT VALIDATION: Only letters allowed - NO spaces, hyphens, dashes, or special characters
         // Validate using code points - this is the most robust method
         // It handles multi-byte characters correctly even if encoding is problematic
         int codePointCount = trimmed.codePointCount(0, trimmed.length());
         for (int i = 0; i < codePointCount; i++) {
             int codePoint = trimmed.codePointAt(trimmed.offsetByCodePoints(0, i));
             
-            // Check if it's a letter (Unicode letter category), space, or hyphen
+            // STRICT: Only Unicode letters allowed - NO spaces, hyphens, or any special characters
             // Character.isLetter() works for all Unicode letters including Turkish characters
-            if (!(Character.isLetter(codePoint) || codePoint == ' ' || codePoint == '-')) {
+            if (!Character.isLetter(codePoint)) {
                 return false;
             }
         }
@@ -125,7 +121,8 @@ public final class ValidationUtils {
     /**
      * Validates a nickname.
      * - Non-null, non-empty
-     * - Letters (including Turkish characters), digits, spaces, '-' and '_' are allowed
+     * - ONLY letters (including Turkish characters) and digits allowed
+     * - STRICTLY NO spaces, hyphens, dashes, underscores, or ANY special characters allowed
      *
      * Uses Unicode-aware validation to properly handle Turkish and other international characters.
      * Validates using code points to handle multi-byte characters correctly.
@@ -142,13 +139,14 @@ public final class ValidationUtils {
             return false;
         }
         
+        // STRICT VALIDATION: Only letters and digits allowed - NO spaces, hyphens, underscores, or special characters
         // Validate using code points to properly handle all Unicode characters including Turkish
         int codePointCount = trimmed.codePointCount(0, trimmed.length());
         for (int i = 0; i < codePointCount; i++) {
             int codePoint = trimmed.codePointAt(trimmed.offsetByCodePoints(0, i));
             
-            // Check if it's a letter, digit, space, hyphen, or underscore
-            if (!(Character.isLetterOrDigit(codePoint) || codePoint == ' ' || codePoint == '-' || codePoint == '_')) {
+            // STRICT: Only letters and digits allowed - NO spaces, hyphens, underscores, or any special characters
+            if (!Character.isLetterOrDigit(codePoint)) {
                 return false;
             }
         }

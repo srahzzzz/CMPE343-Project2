@@ -1,13 +1,14 @@
 package menu;
 
 import dao.ContactDAO;
+import dao.UndoOperationDAO;
 import dao.UserDAO;
 import model.Contact;
 import model.User;
 import service.AuthService;
+import service.UndoService;
 import service.ValidationUtils;
 import util.ColorUtils;
-import util.UndoManager;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -34,7 +35,7 @@ public class SeniorMenu extends BaseMenu {
 
     private final ContactDAO contactDAO;
     private final UserDAO userDAO;
-    private final UndoManager undoManager;
+    private final UndoService undoService;
 
     /**
      * Constructor for SeniorMenu.
@@ -45,7 +46,7 @@ public class SeniorMenu extends BaseMenu {
         super(user);
         this.contactDAO = new ContactDAO();
         this.userDAO = new UserDAO();
-        this.undoManager = new UndoManager(contactDAO);
+        this.undoService = new UndoService(new UndoOperationDAO(), contactDAO, userDAO);
     }
 
     @Override
@@ -87,7 +88,7 @@ public class SeniorMenu extends BaseMenu {
                 deleteContacts();
                 break;
             case 8:
-                undoLastOperation();
+                handleUndoOperation(undoService);
                 break;
             case 9:
                 changePassword();
@@ -371,7 +372,7 @@ public class SeniorMenu extends BaseMenu {
         }
 
         // Record the old state for undo before updating
-        undoManager.recordUpdate(contact);
+        undoService.recordContactUpdate(contact, currentUser.getUserId());
 
         DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
@@ -389,7 +390,7 @@ public class SeniorMenu extends BaseMenu {
             }
 
             if (!ValidationUtils.isValidName(firstName)) {
-                System.out.println(ColorUtils.error("Invalid first name. Use letters only (Turkish characters like İ, ı, ş, ğ, ü, ö, ç are supported). You may use spaces and hyphens. Apostrophes/single quotes are not supported."));
+                System.out.println(ColorUtils.error("Invalid first name. Use ONLY letters (Turkish characters like İ, ı, ş, ğ, ü, ö, ç are supported). NO spaces, hyphens, dashes, or ANY special characters allowed."));
                 continue;
             }
 
@@ -407,7 +408,7 @@ public class SeniorMenu extends BaseMenu {
             }
 
             if (!ValidationUtils.isValidName(middleName)) {
-                System.out.println(ColorUtils.error("Invalid middle name. Use letters only (Turkish characters like İ, ı, ş, ğ, ü, ö, ç are supported). You may use spaces and hyphens. Apostrophes/single quotes are not supported. Press Enter to keep current value."));
+                System.out.println(ColorUtils.error("Invalid middle name. Use ONLY letters (Turkish characters like İ, ı, ş, ğ, ü, ö, ç are supported). NO spaces, hyphens, dashes, or ANY special characters allowed. Press Enter to keep current value."));
                 continue;
             }
 
@@ -425,7 +426,7 @@ public class SeniorMenu extends BaseMenu {
             }
 
             if (!ValidationUtils.isValidName(lastName)) {
-                System.out.println(ColorUtils.error("Invalid last name. Use letters only (Turkish characters like İ, ı, ş, ğ, ü, ö, ç are supported). You may use spaces and hyphens. Apostrophes/single quotes are not supported."));
+                System.out.println(ColorUtils.error("Invalid last name. Use ONLY letters (Turkish characters like İ, ı, ş, ğ, ü, ö, ç are supported). NO spaces, hyphens, dashes, or ANY special characters allowed."));
                 continue;
             }
 
@@ -443,7 +444,7 @@ public class SeniorMenu extends BaseMenu {
             }
 
             if (!ValidationUtils.isValidNickname(nickname)) {
-                System.out.println(ColorUtils.error("Invalid nickname. Allowed characters: letters (Turkish characters like İ, ı, ş, ğ, ü, ö, ç are supported), digits, spaces, '-' and '_'. Press Enter to keep current value."));
+                System.out.println(ColorUtils.error("Invalid nickname. Use ONLY letters (Turkish characters like İ, ı, ş, ğ, ü, ö, ç are supported) and digits. NO spaces, hyphens, dashes, underscores, or ANY special characters allowed. Press Enter to keep current value."));
                 continue;
             }
 
@@ -573,6 +574,12 @@ public class SeniorMenu extends BaseMenu {
             }
         }
 
+        // Record undo operation before updating (save old state)
+        Contact oldContact = contactDAO.findById(contact.getContactId());
+        if (oldContact != null) {
+            undoService.recordContactUpdate(oldContact, currentUser.getUserId());
+        }
+
         if (contactDAO.update(contact)) {
             System.out.println("\n" + ColorUtils.success("Contact updated successfully!"));
         } else {
@@ -618,7 +625,7 @@ public class SeniorMenu extends BaseMenu {
             }
 
             if (!ValidationUtils.isValidName(firstName)) {
-                System.out.println(ColorUtils.error("Invalid first name. Use letters only (Turkish characters like İ, ı, ş, ğ, ü, ö, ç are supported). You may use spaces and hyphens. Apostrophes/single quotes are not supported."));
+                System.out.println(ColorUtils.error("Invalid first name. Use ONLY letters (Turkish characters like İ, ı, ş, ğ, ü, ö, ç are supported). NO spaces, hyphens, dashes, or ANY special characters allowed."));
                 continue;
             }
 
@@ -637,7 +644,7 @@ public class SeniorMenu extends BaseMenu {
             }
 
             if (!ValidationUtils.isValidName(middleName)) {
-                System.out.println(ColorUtils.error("Invalid middle name. Use letters only (Turkish characters like İ, ı, ş, ğ, ü, ö, ç are supported). You may use spaces and hyphens. Apostrophes/single quotes are not supported. Press Enter to skip."));
+                System.out.println(ColorUtils.error("Invalid middle name. Use ONLY letters (Turkish characters like İ, ı, ş, ğ, ü, ö, ç are supported). NO spaces, hyphens, dashes, or ANY special characters allowed. Press Enter to skip."));
                 continue;
             }
 
@@ -656,7 +663,7 @@ public class SeniorMenu extends BaseMenu {
             }
 
             if (!ValidationUtils.isValidName(lastName)) {
-                System.out.println(ColorUtils.error("Invalid last name. Use letters only (Turkish characters like İ, ı, ş, ğ, ü, ö, ç are supported). You may use spaces and hyphens. Apostrophes/single quotes are not supported."));
+                System.out.println(ColorUtils.error("Invalid last name. Use ONLY letters (Turkish characters like İ, ı, ş, ğ, ü, ö, ç are supported). NO spaces, hyphens, dashes, or ANY special characters allowed."));
                 continue;
             }
 
@@ -675,7 +682,7 @@ public class SeniorMenu extends BaseMenu {
             }
 
             if (!ValidationUtils.isValidNickname(nickname)) {
-                System.out.println(ColorUtils.error("Invalid nickname. Allowed characters: letters (Turkish characters like İ, ı, ş, ğ, ü, ö, ç are supported), digits, spaces, '-' and '_'. Press Enter to skip."));
+                System.out.println(ColorUtils.error("Invalid nickname. Use ONLY letters (Turkish characters like İ, ı, ş, ğ, ü, ö, ç are supported) and digits. NO spaces, hyphens, dashes, underscores, or ANY special characters allowed. Press Enter to skip."));
                 continue;
             }
 
@@ -805,7 +812,7 @@ public class SeniorMenu extends BaseMenu {
         if (contactDAO.create(contact)) {
             System.out.println(ColorUtils.success("Contact created successfully! New Contact ID: " + contact.getContactId()));
             // Record the add operation for undo
-            undoManager.recordAdd(contact.getContactId());
+            undoService.recordContactAdd(contact.getContactId(), currentUser.getUserId());
         } else {
             System.out.println(ColorUtils.error("Failed to create contact."));
         }
@@ -878,13 +885,10 @@ public class SeniorMenu extends BaseMenu {
             return;
         }
 
-        // Record delete operations before executing them (in reverse order to maintain stack order)
-        // We'll record them in the order they'll be undone (last deleted first)
-        java.util.List<Integer> idsToDelete = new java.util.ArrayList<>(toDelete.keySet());
-        for (int i = idsToDelete.size() - 1; i >= 0; i--) {
-            Integer id = idsToDelete.get(i);
+        // Record delete operations before executing them
+        for (Integer id : toDelete.keySet()) {
             Contact contactToDelete = toDelete.get(id);
-            undoManager.recordDelete(contactToDelete);
+            undoService.recordContactDelete(contactToDelete, currentUser.getUserId());
         }
 
         int deletedCount = 0;
@@ -904,48 +908,6 @@ public class SeniorMenu extends BaseMenu {
     /**
      * Undoes the last add, update, or delete operation.
      */
-    private void undoLastOperation() {
-        System.out.println("\n" + ColorUtils.header("--- Undo Last Operation ---"));
-        System.out.println(ColorUtils.header("======================================="));
-
-        if (!undoManager.canUndo()) {
-            System.out.println(ColorUtils.warning("No operations available to undo."));
-            System.out.println(ColorUtils.seniorPrompt("Press Enter to continue..."));
-            waitForEnter();
-            return;
-        }
-
-        // Confirmation prompt
-        String confirm;
-        while (true) {
-            System.out.print(ColorUtils.seniorPrompt("Are you sure you want to undo the last operation? (y/n): "));
-            confirm = scanner.nextLine().trim().toLowerCase();
-            
-            if (confirm.equals("y") || confirm.equals("n")) {
-                break;
-            }
-            
-            System.out.println(ColorUtils.error("Invalid choice. Please enter 'y' or 'n' only."));
-        }
-
-        if (!confirm.equals("y")) {
-            System.out.println(ColorUtils.info("Undo cancelled."));
-            System.out.println(ColorUtils.seniorPrompt("Press Enter to continue..."));
-            waitForEnter();
-            return;
-        }
-
-        System.out.println(ColorUtils.info("Undoing the last operation..."));
-        
-        if (undoManager.undo()) {
-            System.out.println(ColorUtils.success("Operation undone successfully!"));
-        } else {
-            System.out.println(ColorUtils.error("Failed to undo the last operation."));
-        }
-        
-        System.out.println(ColorUtils.seniorPrompt("Press Enter to continue..."));
-        waitForEnter();
-    }
 
     /**
      * Change password for the currently logged-in Senior Developer.

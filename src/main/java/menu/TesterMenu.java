@@ -1,10 +1,12 @@
 package menu;
 
 import dao.ContactDAO;
+import dao.UndoOperationDAO;
 import dao.UserDAO;
 import model.Contact;
 import model.User;
 import service.AuthService;
+import service.UndoService;
 import util.ColorUtils;
 
 import java.time.format.DateTimeFormatter;
@@ -26,6 +28,7 @@ import java.util.Map;
 public class TesterMenu extends BaseMenu {
 
     private final ContactDAO contactDAO;
+    private final UndoService undoService;
 
     /**
      * Constructor for TesterMenu.
@@ -35,6 +38,7 @@ public class TesterMenu extends BaseMenu {
     public TesterMenu(User user) {
         super(user);
         this.contactDAO = new ContactDAO();
+        this.undoService = new UndoService(new UndoOperationDAO(), contactDAO, new UserDAO());
     }
 
     @Override
@@ -43,7 +47,8 @@ public class TesterMenu extends BaseMenu {
         System.out.println(ColorUtils.testerMenuOption("2. Search by field"));
         System.out.println(ColorUtils.testerMenuOption("3. Search by multiple fields"));
         System.out.println(ColorUtils.testerMenuOption("4. Sort contacts by selected field"));
-        System.out.println(ColorUtils.testerMenuOption("5. Change password"));
+        System.out.println(ColorUtils.testerMenuOption("5. Undo last operation"));
+        System.out.println(ColorUtils.testerMenuOption("6. Change password"));
         System.out.println(ColorUtils.testerMenuOption("0. Logout"));
     }
 
@@ -63,6 +68,9 @@ public class TesterMenu extends BaseMenu {
                 sortContacts();
                 break;
             case 5:
+                handleUndoOperation(undoService);
+                break;
+            case 6:
                 changePassword();
                 break;
             default:

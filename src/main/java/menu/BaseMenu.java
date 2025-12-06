@@ -1,13 +1,21 @@
 package menu;
 
+import dao.ContactDAO;
+import dao.UndoOperationDAO;
+import dao.UserDAO;
+import model.UndoOperation;
 import model.User;
 import runninghorse.HorseFrames;
 import runninghorse.RunningHorseAnimator;
+import service.UndoService;
 import util.ColorUtils;
 
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Scanner;
 
 /**
@@ -128,13 +136,7 @@ public abstract class BaseMenu {
                         }
                         System.exit(0);
                     } else {
-                        System.out.println("\n" + ColorUtils.info("Logging out... Returning to login screen..."));
-                        // Small delay to show logout message, then clear screen
-                        try {
-                            Thread.sleep(1000); // 1 second delay
-                        } catch (InterruptedException e) {
-                            Thread.currentThread().interrupt();
-                        }
+                        // Clear screen immediately on logout - nothing should remain above
                         clearConsole();
                         running = false; // leave menu and go back to login loop
                     }
@@ -213,21 +215,223 @@ public abstract class BaseMenu {
     }
 
     /**
-     * Clears the console screen.
-     * Uses ANSI escape codes for clearing, with fallback for unsupported terminals.
+     * Clears the console screen completely - AGGRESSIVE WIPE.
+     * Uses Windows native cls command for maximum effectiveness on Windows.
+     * Ensures nothing remains above after logout.
      */
     protected void clearConsole() {
+        String os = System.getProperty("os.name").toLowerCase();
+        boolean isWindows = os.contains("win");
+        
         try {
-            // Use ANSI escape codes to clear screen and move cursor to top-left
+            // Windows native cls via Runtime
+            if (isWindows) {
+                try {
+                    Runtime.getRuntime().exec("cmd /c cls").waitFor();
+                    System.out.flush();
+                } catch (Exception e) {
+                    // Continue with other methods if cls fails
+                }
+            }
+            
+            //  ANSI escape codes - clear entire screen
+            System.out.print("\u001B[2J");
+            System.out.flush();
+            
+            // Move cursor to home position (top-left)
+            System.out.print("\u001B[H");
+            System.out.flush();
+            
+            // Clear scrollback buffer (if terminal supports it)
+            System.out.print("\u001B[3J");
+            System.out.flush();
+            
+            // Nuclear option - print 200 blank lines to push everything off screen
+            for (int i = 0; i < 200; i++) {
+                System.out.println();
+            }
+            System.out.flush();
+            
+            //  Final ANSI clear sequence (double-tap for certainty)
             System.out.print("\u001B[2J\u001B[H");
             System.out.flush();
-        } catch (Exception e) {
-            // Fallback: print many blank lines to clear visible area
+            
+            //One more Windows cls if on Windows (triple-tap for maximum effect)
+            if (isWindows) {
+                try {
+                    Runtime.getRuntime().exec("cmd /c cls").waitFor();
+                    System.out.flush();
+                } catch (Exception e) {
+                    // Ignore
+                }
+            }
+            
+            // METHOD 8: Final blank line push to ensure everything is scrolled off
             for (int i = 0; i < 100; i++) {
                 System.out.println();
             }
             System.out.flush();
+            
+            // Absolute final ANSI clear to ensure cursor at top
+            System.out.print("\u001B[2J\u001B[H");
+            System.out.flush();
+            
+        } catch (Exception e) {
+            //  Maximum blank lines
+            for (int i = 0; i < 500; i++) {
+                System.out.println();
+            }
+            System.out.flush();
         }
+    }
+    
+    /**
+     * Displays undo operations table and allows user to select which operation to undo.
+     * Shows all available operations with operation number, type, entity info, and timestamp.
+     * 
+     * @param undoService the UndoService instance to use
+     */
+    protected void handleUndoOperation(UndoService undoService) {
+        System.out.println("\n" + ColorUtils.header("--- Undo Last Operation ---"));
+        System.out.println(ColorUtils.header("======================================="));
+        
+        List<UndoOperation> operations = undoService.getAllOperations();
+        
+        if (operations.isEmpty()) {
+            System.out.println(ColorUtils.warning("No operations available to undo."));
+            System.out.println("\n" + ColorUtils.colorize("Press Enter to continue...", getRolePromptColor()));
+            waitForEnter();
+            return;
+        }
+        
+        // Display operations table
+        displayUndoOperationsTable(operations);
+        
+        // Get operation selection with strong validation
+        System.out.print("\n" + ColorUtils.colorize("Enter operation number to undo (1-" + operations.size() + "), or 0 to cancel: ", getRolePromptColor()));
+        String input = scanner.nextLine().trim();
+        Integer choice = safeParseInt(input);
+        
+        // Strong validation: must be valid integer, within range, and not null
+        if (choice == null) {
+            System.out.println(ColorUtils.error("Invalid input! Please enter a valid number."));
+            System.out.println("\n" + ColorUtils.colorize("Press Enter to continue...", getRolePromptColor()));
+            waitForEnter();
+            return;
+        }
+        
+        if (choice == 0) {
+            System.out.println(ColorUtils.info("Operation cancelled."));
+            System.out.println("\n" + ColorUtils.colorize("Press Enter to continue...", getRolePromptColor()));
+            waitForEnter();
+            return;
+        }
+        
+        if (choice < 1 || choice > operations.size()) {
+            System.out.println(ColorUtils.error("Invalid operation number! Please enter a number between 1 and " + operations.size() + "."));
+            System.out.println("\n" + ColorUtils.colorize("Press Enter to continue...", getRolePromptColor()));
+            waitForEnter();
+            return;
+        }
+        
+        // Get the selected operation (operations are ordered newest first, so index is choice - 1)
+        UndoOperation selectedOperation = operations.get(choice - 1);
+        
+        // Confirm before undoing
+        System.out.print("\n" + ColorUtils.colorize("Are you sure you want to undo this operation? (y/n): ", getRolePromptColor()));
+        String confirm = scanner.nextLine().trim().toLowerCase();
+        
+        if (!confirm.equals("y") && !confirm.equals("yes")) {
+            System.out.println(ColorUtils.info("Operation cancelled."));
+            System.out.println("\n" + ColorUtils.colorize("Press Enter to continue...", getRolePromptColor()));
+            waitForEnter();
+            return;
+        }
+        
+        // Execute undo
+        boolean success = undoService.undoOperation(selectedOperation.getOperationId());
+        
+        if (success) {
+            System.out.println(ColorUtils.success("Operation undone successfully!"));
+        } else {
+            System.out.println(ColorUtils.error("Failed to undo operation. The operation may have already been undone or the entity no longer exists."));
+        }
+        
+        System.out.println("\n" + ColorUtils.colorize("Press Enter to continue...", getRolePromptColor()));
+        waitForEnter();
+    }
+    
+    /**
+     * Displays undo operations in a formatted table.
+     * Shows operation number, type, entity type, entity ID, and timestamp.
+     * 
+     * @param operations the list of operations to display
+     */
+    private void displayUndoOperationsTable(List<UndoOperation> operations) {
+        if (operations.isEmpty()) {
+            return;
+        }
+        
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        
+        // Table headers
+        String[] headers = {"#", "Operation", "Entity Type", "Entity ID", "Timestamp"};
+        int[] columnWidths = {3, 10, 12, 10, 19};
+        
+        // Build separator line
+        StringBuilder separator = new StringBuilder();
+        for (int width : columnWidths) {
+            separator.append("+");
+            for (int j = 0; j < width + 1; j++) {
+                separator.append("-");
+            }
+        }
+        separator.append("+");
+        
+        // Display header
+        StringBuilder headerLine = new StringBuilder();
+        for (int i = 0; i < headers.length; i++) {
+            headerLine.append("|");
+            headerLine.append(String.format("%-" + columnWidths[i] + "s", headers[i]));
+        }
+        headerLine.append("|");
+        
+        System.out.println(ColorUtils.colorize(separator.toString(), ColorUtils.CYAN));
+        System.out.println(ColorUtils.header(headerLine.toString()));
+        System.out.println(ColorUtils.colorize(separator.toString(), ColorUtils.CYAN));
+        
+        // Display rows
+        for (int i = 0; i < operations.size(); i++) {
+            UndoOperation op = operations.get(i);
+            StringBuilder rowLine = new StringBuilder();
+            
+            // Operation number (1-based for user display)
+            rowLine.append("|");
+            rowLine.append(String.format("%-" + columnWidths[0] + "s", (i + 1)));
+            
+            // Operation type
+            rowLine.append("|");
+            rowLine.append(String.format("%-" + columnWidths[1] + "s", op.getOperationType().name()));
+            
+            // Entity type
+            rowLine.append("|");
+            rowLine.append(String.format("%-" + columnWidths[2] + "s", op.getEntityType().name()));
+            
+            // Entity ID
+            rowLine.append("|");
+            rowLine.append(String.format("%-" + columnWidths[3] + "s", op.getEntityId()));
+            
+            // Timestamp
+            rowLine.append("|");
+            String timestamp = op.getOperationTimestamp() != null ? 
+                op.getOperationTimestamp().format(formatter) : "N/A";
+            rowLine.append(String.format("%-" + columnWidths[4] + "s", timestamp));
+            
+            rowLine.append("|");
+            System.out.println(rowLine.toString());
+        }
+        
+        System.out.println(ColorUtils.colorize(separator.toString(), ColorUtils.CYAN));
     }
 }
 
